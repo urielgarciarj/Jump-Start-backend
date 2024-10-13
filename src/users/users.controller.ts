@@ -9,13 +9,12 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() newUser: CreateUserDto) {
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(newUser.password, salt);
-    newUser.password = hashedPassword;
     const existingUser = await this.usersService.findByEmail(newUser.email);
     if (existingUser) {
       throw new HttpException('Email already registered', HttpStatus.CONFLICT);
     }
+
+    newUser.password = await bcrypt.hash(newUser.password, 10);
     console.log('Creating a new user');
     return this.usersService.createUser(newUser);
   }
