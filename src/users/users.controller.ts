@@ -1,5 +1,6 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ValidateExistingUser } from './dto/validate-existing-user.dto';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
 
@@ -18,4 +19,19 @@ export class UsersController {
     console.log('Creating a new user');
     return this.usersService.createUser(newUser);
   }
+
+  @Post('login')
+  async login(@Body() user: ValidateExistingUser) {
+    console.log('email', user.email);
+    console.log('password', user.password);
+
+    const isValidUser = await this.usersService.validateUser(user.email, user.password);
+    if (!isValidUser) {
+      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
+    }
+
+    return { message: 'Login successful' };
+
+  }
+
 }
