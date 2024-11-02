@@ -12,14 +12,11 @@ export class ExperiencesController {
     return this.experiencesService.create(createExperienceDto);
   }
 
-  @Get()
-  findAll() {
-    return this.experiencesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.experiencesService.findOne(+id);
+  // Get all experiences related to a user by its id
+  @Get('list/:id')
+  findAllByUser(@Param('id') id: string) {
+      console.log("Getting all projects by one user!")
+      return this.experiencesService.findAllByUser(Number(id));
   }
 
   @Patch(':id')

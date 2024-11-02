@@ -14,24 +14,27 @@ export class ExperiencesService {
   ) {}
 
   // Creates new experience
-  async create(experience: CreateExperienceDto) {
-    const user = await this.usersRepository.findOne({ where: { id: experience.userId } });
+  async create(createExperienceDto: CreateExperienceDto) {
+    const user = await this.usersRepository.findOne({ where: { id: createExperienceDto.userId } });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with ID ${createExperienceDto.userId} not found`);
     }
     const newExperience = this.experienceRepository.create({
-      ...experience,
+      ...createExperienceDto,
       user
     });
     return this.experienceRepository.save(newExperience);
   }
-
-  findAll() {
-    return `This action returns all experiences`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} experience`;
+  
+  // Get experiences related to a user
+  async findAllByUser(userId: number): Promise<Experience[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    console.log('user', user)
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    
+    return this.experienceRepository.find({ where: { user: user } });
   }
 
   update(id: number, updateExperienceDto: UpdateExperienceDto) {
