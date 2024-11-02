@@ -18,11 +18,11 @@ export class Experience {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'date' })
-  startDate: string;
+  @Column()
+  startDate: Date;
 
-  @Column({ type: 'date' })
-  endDate: string;
+  @Column({ nullable: true })
+  endDate: Date;
 
   @ManyToOne(() => User, (user) => user.experiences)
   user: User; // Foreign key related to a user

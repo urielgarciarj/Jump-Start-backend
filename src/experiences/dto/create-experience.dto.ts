@@ -17,13 +17,13 @@ export class CreateExperienceDto {
     description: string;
 
     @IsNotEmpty()
-    @IsDateString() // Valida que sea una fecha en formato válido
-    startDate: string;
-
-    @IsOptional() // Si es opcional
     @IsDateString()
-    endDate?: string; // Puede ser opcional si no hay una fecha de finalización
+    startDate: Date;
+
+    @IsOptional() // OPTIONAL
+    @IsDateString()
+    endDate?: Date; 
 
     @IsNotEmpty()
-    userId: number; // ID del usuario que crea la experiencia
+    userId: number;
 }
