@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany } from 'typeorm';
+import { Project } from '../projects/project.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -19,4 +20,7 @@ export class User {
 
   @Column()
   role: string;
+
+  @OneToMany(() => Project, project => project.professor)
+  projects: Project[];
 }
