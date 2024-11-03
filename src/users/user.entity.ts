@@ -1,5 +1,8 @@
 import { TeacherClasses } from 'src/teachers-classes/teacher-classes.entity';
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany } from 'typeorm';
+import { Experience } from '../experiences/experience.entity';
+
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -22,4 +25,7 @@ export class User {
 
   @OneToMany(() => TeacherClasses, (teachersClasses) => teachersClasses.user)
   teachersClasses: TeacherClasses[];
+
+  @OneToMany(() => Experience, (experience) => experience.user)
+  experiences: Experience[];
 }
