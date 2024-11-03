@@ -13,24 +13,25 @@ export class TeachersClassesController {
   }
 
   // Get all teachers classes
-  @Get()
-    async findAll() {
-        return this.TeachersClassesService.findAll();
-    }
-  
+  @Get('list/:id')
+  findAllByUser(@Param('id') id: string) {
+      console.log("Getting all projects by one user!")
+      return this.TeachersClassesService.findAllByUser(Number(id));
+  }
 
-  // Update
-//   @Put('update/:id')
-//   async UpdateTeachersClassesDto(
-//     @Param('id') id: number,
-//     @Body() updateTeacherClassesDto: UpdateTeachersClassesDto,
-//   ): Promise<TeacherClasses> {
-//     return this.TeachersClassesService.UpdateTeachersClassesDto(id, updateTeacherClassesDto);
-//   }
+  // Update a field from a project by id
+  @Put('update/:id')
+  async updateClass(
+    @Param('id') id: number,
+    @Body() updateExperienceDto: UpdateTeachersClassesDto,
+  ): Promise<TeacherClasses> {
+    console.log('id update', id);
+    return this.TeachersClassesService.updateClass(id, updateExperienceDto);
+  }
 
-//   // Delete an experience by id
-//   @Delete('delete/:id')
-//   remove(@Param('id') id: string) {
-//       return this.TeachersClassesService.remove(Number(id));
-//   }
+  // Delete an experience by id
+  @Delete('delete/:id')
+  remove(@Param('id') id: string) {
+      return this.TeachersClassesService.remove(Number(id));
+  }
 }

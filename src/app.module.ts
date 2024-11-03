@@ -14,7 +14,7 @@ import { TeachersClassesModule } from './teachers-classes/teachers-classes.modul
       password: '',
       database: 'jump-start-db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
     }),
     UsersModule,
     TeachersClassesModule],

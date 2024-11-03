@@ -26,29 +26,35 @@ export class TeachersClassesService {
           });
         return this.teachersRepository.save(tClass);
       }
-    
-      async findAll() {
-        return await this.teachersRepository.find();
+
+      async findAllByUser(userId: number): Promise<TeacherClasses[]> {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+          throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+        
+        return this.teachersRepository.find({ where: { user: user } });
       }
     
-      async findOne(id: number) {
-        return await this.teachersRepository.findOneBy({ id });
+      // Update fields from a project by id
+      async updateClass(id: number, updateTeachersClassesDto: UpdateTeachersClassesDto): Promise<TeacherClasses> {
+        const tClass = await this.teachersRepository.findOne({ where: { id: id } });
+        console.log('tclass service', tClass);
+        if (!tClass) {
+          throw new NotFoundException(`Class with ID ${id} not found`);
+        }
+        // Updated fields
+        Object.assign(tClass, updateTeachersClassesDto);
+    
+        return this.teachersRepository.save(tClass);
       }
     
-    //   async update(id: number, updateClaseDto: UpdateTeachersClassesDto, teacherId: number) {
-    //     const tClass = await this.teachersRepository.findOneBy({ id });
-    //     if (!tClass || tClass.teacherId !== teacherId) {
-    //       throw new ForbiddenException('You do not have permissions to update this class');
-    //     }
-    //     Object.assign(tClass, updateClaseDto);
-    //     return await this.teachersRepository.save(tClass);
-    //   }
-    
-    //   async remove(id: number, teacherId: number) {
-    //     const tClase = await this.teachersRepository.findOneBy({ id });
-    //     if (!tClase || tClase.teacherId !== teacherId) {
-    //       throw new ForbiddenException('You do not have permissions to delete this class');
-    //     }
-    //     return await this.teachersRepository.remove(tClass);
-    //   }
+      // Delete an experience by id
+      async remove(id: number): Promise<void> {
+        const tClass = await this.teachersRepository.findOne({ where: { id } });
+        if (!tClass) {
+          throw new NotFoundException(`Class with ID ${id} not found`);
+        }
+        await this.teachersRepository.remove(tClass);
+      }
 }
