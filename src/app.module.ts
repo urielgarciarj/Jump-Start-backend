@@ -3,8 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TeachersClassesService } from './teachers-classes/teachers-classes.service';
-import { TeachersClassesController } from './teachers-classes/teachers-classes.controller';
 import { TeachersClassesModule } from './teachers-classes/teachers-classes.module';
 @Module({
   imports: [
@@ -16,11 +14,11 @@ import { TeachersClassesModule } from './teachers-classes/teachers-classes.modul
       password: '',
       database: 'jump-start-db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
     }),
     UsersModule,
     TeachersClassesModule],
-  controllers: [AppController, TeachersClassesController],
-  providers: [AppService, TeachersClassesService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

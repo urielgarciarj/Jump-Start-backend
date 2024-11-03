@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
-
+import { TeacherClasses } from 'src/teachers-classes/teacher-classes.entity';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany, ManyToOne } from 'typeorm';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -19,4 +19,7 @@ export class User {
 
   @Column()
   role: string;
+
+  @OneToMany(() => TeacherClasses, (teachersClasses) => teachersClasses.user)
+  teachersClasses: TeacherClasses[];
 }
