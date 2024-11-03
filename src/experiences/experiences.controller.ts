@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
 import { ExperiencesService } from './experiences.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
+import { Experience } from './experience.entity';
 
 @Controller('experiences')
 export class ExperiencesController {
@@ -19,13 +20,18 @@ export class ExperiencesController {
       return this.experiencesService.findAllByUser(Number(id));
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExperienceDto: UpdateExperienceDto) {
-    return this.experiencesService.update(+id, updateExperienceDto);
+  // Update a field from a project by id
+  @Put('update/:id')
+  async updateExperience(
+    @Param('id') id: number,
+    @Body() updateExperienceDto: UpdateExperienceDto,
+  ): Promise<Experience> {
+    return this.experiencesService.updateExperience(id, updateExperienceDto);
   }
 
-  @Delete(':id')
+  // Delete an experience by id
+  @Delete('delete/:id')
   remove(@Param('id') id: string) {
-    return this.experiencesService.remove(+id);
+      return this.experiencesService.remove(Number(id));
   }
 }

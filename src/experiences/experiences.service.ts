@@ -25,11 +25,10 @@ export class ExperiencesService {
     });
     return this.experienceRepository.save(newExperience);
   }
-  
+
   // Get experiences related to a user
   async findAllByUser(userId: number): Promise<Experience[]> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    console.log('user', user)
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
@@ -37,11 +36,24 @@ export class ExperiencesService {
     return this.experienceRepository.find({ where: { user: user } });
   }
 
-  update(id: number, updateExperienceDto: UpdateExperienceDto) {
-    return `This action updates a #${id} experience`;
+  // Update fields from a project by id
+  async updateExperience(id: number, updateExperienceDto: UpdateExperienceDto): Promise<Experience> {
+    const experience = await this.experienceRepository.findOne({ where: { id: id } });
+    if (!experience) {
+      throw new NotFoundException(`Experience with ID ${id} not found`);
+    }
+    // Updated fields
+    Object.assign(experience, updateExperienceDto);
+
+    return this.experienceRepository.save(experience);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} experience`;
+  // Delete an experience by id
+  async remove(id: number): Promise<void> {
+    const experience = await this.experienceRepository.findOne({ where: { id } });
+    if (!experience) {
+      throw new NotFoundException(`Experience with ID ${id} not found`);
+    }
+    await this.experienceRepository.remove(experience);
   }
 }
