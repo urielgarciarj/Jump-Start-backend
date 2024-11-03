@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeachersClassesModule } from './teachers-classes/teachers-classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
       synchronize: true,
     }),
     UsersModule,
+    TeachersClassesModule,
     ExperiencesModule],
   controllers: [AppController],
   providers: [AppService],
