@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
+import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeachersClassesModule } from './teachers-classes/teachers-classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
@@ -18,6 +19,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
       synchronize: true,
     }),
     UsersModule,
+    ProjectModule,
     TeachersClassesModule,
     ExperiencesModule],
   controllers: [AppController],
