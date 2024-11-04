@@ -16,7 +16,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
       password: '',
       database: 'jump-start-db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
     }),
     UsersModule,
     ProjectModule,
