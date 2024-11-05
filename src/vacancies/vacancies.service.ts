@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Vacancies } from './vacancies.entity';
+import { Vacant } from './vacancies.entity';
 
 @Injectable()
 export class VacanciesService {
 
     constructor(
-        @InjectRepository(Vacancies) private vacanciesRepository: Repository<Vacancies>,
+        @InjectRepository(Vacant) private vacanciesRepository: Repository<Vacant>,
     ) {}
 
     create(createVacantDto: any) {

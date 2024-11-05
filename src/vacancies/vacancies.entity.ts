@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne } from 't
 import { User } from '../users/user.entity';
 
 @Entity({ name: 'vacancies' })
-export class Vacancies {
+export class Vacant {
     @PrimaryGeneratedColumn()
     id: number;
 
