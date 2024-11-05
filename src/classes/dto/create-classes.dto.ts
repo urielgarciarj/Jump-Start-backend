@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsOptional, IsDateString } from 'class-validator';
 
-export class CreateTeachersClassesDto {
+export class CreateClassesDto {
     @IsNotEmpty()
     @IsString()
     name: string;

@@ -1,60 +1,60 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TeacherClasses } from './teacher-classes.entity';
+import { Class } from './classes.entity';
 import { User } from '../users/user.entity';
-import { CreateTeachersClassesDto } from './dto/create-teachers-classes.dto';
-import { UpdateTeachersClassesDto } from './dto/update-teachers-classes.dto';
+import { CreateClassesDto } from './dto/create-classes.dto';
+import { UpdateClassesDto } from './dto/update-classes.dto';
 @Injectable()
-export class TeachersClassesService {
+export class ClassesService {
     constructor(
         @InjectRepository(User) private usersRepository: Repository<User>,
-        @InjectRepository(TeacherClasses) private teachersRepository: Repository<TeacherClasses>
+        @InjectRepository(Class) private ClassesRepository: Repository<Class>
       ) {}
     
       // Creates new classes for a teacher
-      async createClass(createClassesDto: CreateTeachersClassesDto) {
+      async createClass(createClassesDto: CreateClassesDto) {
         const user = await this.usersRepository.findOne({ where: { id: createClassesDto.teacherId } });
         console.log('user', user);
     
         if (!user || user.role !== 'docente') {
           throw new NotFoundException(`User with ID ${createClassesDto.teacherId} not found`);
         }
-        const tClass = this.teachersRepository.create({
+        const tClass = this.ClassesRepository.create({
             ...createClassesDto,
             user, 
           });
-        return this.teachersRepository.save(tClass);
+        return this.ClassesRepository.save(tClass);
       }
 
-      async findAllByUser(userId: number): Promise<TeacherClasses[]> {
+      async findAllByUser(userId: number): Promise<Class[]> {
         const user = await this.usersRepository.findOne({ where: { id: userId } });
         if (!user) {
           throw new NotFoundException(`User with ID ${userId} not found`);
         }
         
-        return this.teachersRepository.find({ where: { user: user } });
+        return this.ClassesRepository.find({ where: { user: user } });
       }
     
       // Update fields from a project by id
-      async updateClass(id: number, updateTeachersClassesDto: UpdateTeachersClassesDto): Promise<TeacherClasses> {
-        const tClass = await this.teachersRepository.findOne({ where: { id: id } });
+      async updateClass(id: number, updateClassesDto: UpdateClassesDto): Promise<Class> {
+        const tClass = await this.ClassesRepository.findOne({ where: { id: id } });
         console.log('tclass service', tClass);
         if (!tClass) {
           throw new NotFoundException(`Class with ID ${id} not found`);
         }
         // Updated fields
-        Object.assign(tClass, updateTeachersClassesDto);
+        Object.assign(tClass, updateClassesDto);
     
-        return this.teachersRepository.save(tClass);
+        return this.ClassesRepository.save(tClass);
       }
     
       // Delete an experience by id
       async remove(id: number): Promise<void> {
-        const tClass = await this.teachersRepository.findOne({ where: { id } });
+        const tClass = await this.ClassesRepository.findOne({ where: { id } });
         if (!tClass) {
           throw new NotFoundException(`Class with ID ${id} not found`);
         }
-        await this.teachersRepository.remove(tClass);
+        await this.ClassesRepository.remove(tClass);
       }
 }

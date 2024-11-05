@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 
-@Entity({ name: 'teachersClasses' })
-export class TeacherClasses {
+@Entity({ name: 'classes' })
+export class Class {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,6 +21,6 @@ export class TeacherClasses {
   @Column()
   university: string;
 
-  @ManyToOne(() => User, (user) => user.teachersClasses)
+  @ManyToOne(() => User, (user) => user.classes)
   user: User; // Foreign key related to a user
 }

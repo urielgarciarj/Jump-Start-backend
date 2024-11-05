@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Project } from '../projects/project.entity';
-import { TeacherClasses } from 'src/teachers-classes/teacher-classes.entity';
+import { Class } from 'src/classes/classes.entity';
 import { Experience } from '../experiences/experience.entity';
 
 @Entity({ name: 'users' })
@@ -26,8 +26,8 @@ export class User {
   @OneToMany(() => Project, project => project.professor)
   projects: Project[];
 
-  @OneToMany(() => TeacherClasses, (teachersClasses) => teachersClasses.user)
-  teachersClasses: TeacherClasses[];
+  @OneToMany(() => Class, (classes) => classes.user)
+  classes: Class[];
 
   @OneToMany(() => Experience, (experience) => experience.user)
   experiences: Experience[];
