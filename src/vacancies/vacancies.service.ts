@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Vacant } from './vacancies.entity';
@@ -22,7 +22,7 @@ export class VacanciesService {
         }
 
         if (user.role !== 'reclutador') {
-          throw new NotFoundException('Only users with the role of reclutador can create vacancies');
+            throw new ForbiddenException(`User with ID ${createVacantDto.userId} is not a recruiter`);
         }
     
         const newVacant = this.vacanciesRepository.create({
@@ -32,4 +32,20 @@ export class VacanciesService {
     
         return this.vacanciesRepository.save(newVacant);
     }
+
+    // Get all vacancies related to a recruiter
+    async findAllByRecruiter(userId: number): Promise<Vacant[]> {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        if (user.role !== 'reclutador') {
+            throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+        }
+
+        return this.vacanciesRepository.find({ where: { user: user } });
+    }
+
 }
