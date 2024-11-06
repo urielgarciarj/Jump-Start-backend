@@ -6,6 +6,7 @@ import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassesModule } from './classes/classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
+import { ProfilesModule } from './profiles/profiles.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -19,6 +20,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
       synchronize: true,
     }),
     UsersModule,
+    ProfilesModule,
     ProjectModule,
     ClassesModule,
     ExperiencesModule],
