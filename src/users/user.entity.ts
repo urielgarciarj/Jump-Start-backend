@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { Class } from 'src/classes/classes.entity';
 import { Experience } from '../experiences/experience.entity';
+import { Event } from '../events/event.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -31,4 +32,7 @@ export class User {
 
   @OneToMany(() => Experience, (experience) => experience.user)
   experiences: Experience[];
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 }

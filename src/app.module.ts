@@ -6,6 +6,7 @@ import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassesModule } from './classes/classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
+import { EventsModule } from './events/events.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -21,7 +22,8 @@ import { ExperiencesModule } from './experiences/experiences.module';
     UsersModule,
     ProjectModule,
     ClassesModule,
-    ExperiencesModule],
+    ExperiencesModule,
+    EventsModule],
   controllers: [AppController],
   providers: [AppService],
 })
