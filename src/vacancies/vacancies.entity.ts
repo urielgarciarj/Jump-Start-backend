@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, CreateDateColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity({ name: 'vacancies' })
@@ -29,6 +29,12 @@ export class Vacant {
 
     @Column()
     salary: number;
+
+    @Column({ default: 'activo' })
+    status: string;
+
+    @CreateDateColumn()
+    createdAt: Date;
 
     @ManyToOne(() => User, (user) => user.vacancies)
     user: User; // Foreign key related to a user

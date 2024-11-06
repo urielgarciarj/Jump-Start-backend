@@ -29,6 +29,7 @@ export class VacanciesService {
         const newVacant = this.vacanciesRepository.create({
           ...createVacantDto,
           user,
+          status: 'activo',
         });
     
         return this.vacanciesRepository.save(newVacant);
