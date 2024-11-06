@@ -31,4 +31,12 @@ export class ProfilesService {
 
     return this.profileRepository.save(profile);
   }
-}
+
+  async findOne(id: number): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { id } });
+    if (!profile) {
+      throw new NotFoundException(`Profile with ID ${id} not found`);
+    }
+    return profile;
+  }
+} 

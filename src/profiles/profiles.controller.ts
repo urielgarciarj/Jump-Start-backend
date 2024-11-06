@@ -13,26 +13,11 @@ export class ProfilesController {
   ) {
     return this.profilesService.updateOrCreateProfile(userId, updateProfileDto);
   }
-  
-  // @Post()
-  // create(@Body() createProfileDto: CreateProfileDto) {
-  //   return this.profilesService.create(createProfileDto);
-  // }
 
-  // @Get()
-  // findAll() {
-  //   return this.profilesService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.profilesService.findOne(+id);
-  // }
-
-  // @Patch(':id') 
-  // update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-  //   return this.profilesService.update(+id, updateProfileDto);
-  // }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.profilesService.findOne(Number(id));
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
