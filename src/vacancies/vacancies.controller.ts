@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Param, Put } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { VacanciesService } from './vacancies.service';
 import { CreateVacantDto } from './dto/create-vacant.dto';
 import { UpdateVacantDto } from './dto/update-vacant.dto';
@@ -35,5 +43,12 @@ export class VacanciesController {
     @Body() updateVacantDto: UpdateVacantDto,
   ): Promise<Vacant> {
     return this.vacanciesService.updateVacant(id, updateVacantDto);
+  }
+
+  // Delete a vacant by id
+  @Delete('delete/:id')
+  remove(@Param('id') id: string) {
+    console.log('Deleting vacant!');
+    return this.vacanciesService.remove(Number(id));
   }
 }

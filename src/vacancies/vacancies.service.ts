@@ -68,4 +68,15 @@ export class VacanciesService {
         return this.vacanciesRepository.save(vacant);
     }
 
+    // Delete a vacant by id
+    async remove(id: number): Promise<void> {
+        const vacant = await this.vacanciesRepository.findOne({ where: { id } });
+
+        if (!vacant) {
+            throw new NotFoundException(`Vacant with ID ${id} not found`);
+        }
+
+        await this.vacanciesRepository.remove(vacant);
+    }
+
 }
