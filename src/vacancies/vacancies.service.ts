@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Vacant } from './vacancies.entity';
@@ -8,76 +12,125 @@ import { UpdateVacantDto } from './dto/update-vacant.dto';
 
 @Injectable()
 export class VacanciesService {
+  constructor(
+    @InjectRepository(Vacant) private vacanciesRepository: Repository<Vacant>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
 
-    constructor(
-        @InjectRepository(Vacant) private vacanciesRepository: Repository<Vacant>,
-        @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {}
+  // Create a new vacant
+  async create(createVacantDto: CreateVacantDto) {
+    const user = await this.usersRepository.findOne({
+      where: { id: createVacantDto.userId },
+    });
 
-    // Create a new vacant
-    async create(createVacantDto: CreateVacantDto) {
-        const user = await this.usersRepository.findOne({ where: { id: createVacantDto.userId } });
-
-        if (!user) {
-            throw new NotFoundException(`User with ID ${createVacantDto.userId} not found`);
-        }
-
-        if (user.role !== 'reclutador') {
-            throw new ForbiddenException(`User with ID ${createVacantDto.userId} is not a recruiter`);
-        }
-    
-        const newVacant = this.vacanciesRepository.create({
-          ...createVacantDto,
-          user,
-          status: 'activo',
-        });
-    
-        return this.vacanciesRepository.save(newVacant);
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${createVacantDto.userId} not found`,
+      );
     }
 
-    // Get all vacancies related to a recruiter
-    async findAllByRecruiter(userId: number): Promise<Vacant[]> {
-        const user = await this.usersRepository.findOne({ where: { id: userId } });
-
-        if (!user) {
-            throw new NotFoundException(`User with ID ${userId} not found`);
-        }
-
-        if (user.role !== 'reclutador') {
-            throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
-        }
-
-        return this.vacanciesRepository.find({ where: { user: user } });
+    if (user.role !== 'reclutador') {
+      throw new ForbiddenException(
+        `User with ID ${createVacantDto.userId} is not a recruiter`,
+      );
     }
 
-    // Get all vacancies
-    async findAll(): Promise<Vacant[]> {
-        return this.vacanciesRepository.find();
+    const newVacant = this.vacanciesRepository.create({
+      ...createVacantDto,
+      user,
+      status: 'activo',
+    });
+
+    return this.vacanciesRepository.save(newVacant);
+  }
+
+  // Get all vacancies related to a recruiter
+  async findAllByRecruiter(userId: number): Promise<Vacant[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    // Update fields from a vacant by id
-    async updateVacant(id: number, updateVacantDto: UpdateVacantDto): Promise<Vacant> {
-        const vacant = await this.vacanciesRepository.findOne({ where: { id: id } });
-
-        if (!vacant) {
-            throw new NotFoundException(`Vacant with ID ${id} not found`);
-        }
-
-        // Updated fields
-        Object.assign(vacant, updateVacantDto);
-
-        return this.vacanciesRepository.save(vacant);
+    if (user.role !== 'reclutador') {
+      throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
 
-    // Delete a vacant by id
-    async remove(id: number): Promise<void> {
-        const vacant = await this.vacanciesRepository.findOne({ where: { id } });
+    return this.vacanciesRepository.find({ where: { user: user } });
+  }
 
-        if (!vacant) {
-            throw new NotFoundException(`Vacant with ID ${id} not found`);
-        }
+  // Get all vacancies related to a recruiter sorted by status
+  async findAllByRecruiterSorted(userId: number): Promise<Vacant[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
 
-        await this.vacanciesRepository.remove(vacant);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
+    if (user.role !== 'reclutador') {
+      throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+    }
+
+    const vacancies = await this.vacanciesRepository.find({
+      where: { user: user },
+    });
+    return vacancies.sort((a, b) => {
+      if (a.status === 'activo' && b.status !== 'activo') {
+        return -1;
+      }
+      if (a.status !== 'activo' && b.status === 'activo') {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
+  // Get all vacancies
+  async findAll(): Promise<Vacant[]> {
+    return this.vacanciesRepository.find();
+  }
+
+  // Get all vacancies sorted by status
+  async findAllSortedByStatus(): Promise<Vacant[]> {
+    const vacancies = await this.vacanciesRepository.find();
+    return vacancies.sort((a, b) => {
+      if (a.status === 'activo' && b.status !== 'activo') {
+        return -1;
+      }
+      if (a.status !== 'activo' && b.status === 'activo') {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
+  // Update fields from a vacant by id
+  async updateVacant(
+    id: number,
+    updateVacantDto: UpdateVacantDto,
+  ): Promise<Vacant> {
+    const vacant = await this.vacanciesRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!vacant) {
+      throw new NotFoundException(`Vacant with ID ${id} not found`);
+    }
+
+    // Updated fields
+    Object.assign(vacant, updateVacantDto);
+
+    return this.vacanciesRepository.save(vacant);
+  }
+
+  // Delete a vacant by id
+  async remove(id: number): Promise<void> {
+    const vacant = await this.vacanciesRepository.findOne({ where: { id } });
+
+    if (!vacant) {
+      throw new NotFoundException(`Vacant with ID ${id} not found`);
+    }
+
+    await this.vacanciesRepository.remove(vacant);
+  }
 }
