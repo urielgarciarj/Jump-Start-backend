@@ -6,7 +6,7 @@ export class Profile {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ default: 'Comparte un poco sobre tu trayectoria y lo que te gusta hacer.', type: 'text' })
+    @Column({ default: 'Mi trayectoria...', type: 'text' })
     aboutMe?: string;
 
     @Column({ nullable: true })

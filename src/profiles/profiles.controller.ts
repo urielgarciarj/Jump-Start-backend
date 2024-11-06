@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
-import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('profiles')
@@ -8,7 +7,7 @@ export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
   @Patch('update/:userId')
-  async updateProfile(
+  async upsertProfile(
     @Param('userId') userId: number,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
