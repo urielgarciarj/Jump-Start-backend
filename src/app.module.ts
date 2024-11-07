@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassesModule } from './classes/classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
 import { ProfilesModule } from './profiles/profiles.module';
+import { UniversitiesModule } from './universities/universities.module';
+import { CompaniesModule } from './companies/companies.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -23,7 +25,9 @@ import { ProfilesModule } from './profiles/profiles.module';
     ProfilesModule,
     ProjectModule,
     ClassesModule,
-    ExperiencesModule],
+    ExperiencesModule,
+    UniversitiesModule,
+    CompaniesModule],
   controllers: [AppController],
   providers: [AppService],
 })
