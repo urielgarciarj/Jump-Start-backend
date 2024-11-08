@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { UniversitiesService } from './universities.service';
 import { CreateUniversityDto } from './dto/create-university.dto';
-import { UpdateUniversityDto } from './dto/update-university.dto';
 
 @Controller('universities')
 export class UniversitiesController {
   constructor(private readonly universitiesService: UniversitiesService) {}
 
-  @Post()
-  create(@Body() createUniversityDto: CreateUniversityDto) {
+  @Post('create')
+  async create(@Body() createUniversityDto: CreateUniversityDto) {
+    const existingUniversity = await this.universitiesService.findExistingOneByName(createUniversityDto.name);
+    if (existingUniversity) {
+      throw new HttpException('University already registered', HttpStatus.CONFLICT);
+    }
+
     return this.universitiesService.create(createUniversityDto);
   }
 
-  @Get()
+  @Get('list')
   findAll() {
     return this.universitiesService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.universitiesService.findOne(+id);
+    const university = this.universitiesService.findOne(+id);
+    if (!university) {
+      
+    }
+    return university;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUniversityDto: UpdateUniversityDto) {
-    return this.universitiesService.update(+id, updateUniversityDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.universitiesService.remove(+id);
-  }
 }
