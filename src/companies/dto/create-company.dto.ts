@@ -11,21 +11,21 @@ export class CreateCompanyDto {
 
     @IsNotEmpty()
     @IsString()
-    sitioWeb?: string;
+    sitioWeb: string;
 
     @IsNotEmpty()
     @IsString()
-    sector?: string;
+    sector: string;
 
     @IsNotEmpty()
     @IsString()
-    size?: string;
+    size: string;
 
     @IsNotEmpty()
     @IsString()
-    sede?: string;
+    sede: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     specialties?: string;
 

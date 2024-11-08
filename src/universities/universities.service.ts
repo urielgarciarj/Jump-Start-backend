@@ -7,20 +7,20 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class UniversitiesService {
   constructor(
-    @InjectRepository(University) private universitiesRepository: Repository<University>,
+    @InjectRepository(University) private universityRepository: Repository<University>,
   ) {}
 
   async create(createUniversityDto: CreateUniversityDto) {
-    const newUniversity = this.universitiesRepository.create(createUniversityDto);
-    return this.universitiesRepository.save(newUniversity);
+    const newUniversity = this.universityRepository.create(createUniversityDto);
+    return this.universityRepository.save(newUniversity);
   }
 
   findAll() {
-    return this.universitiesRepository.find({ where: { status: 'active' } });
+    return this.universityRepository.find({ where: { status: 'active' } });
   }
 
   async findOne(id: number) {
-    const university = await this.universitiesRepository.findOne({ where: { id } });
+    const university = await this.universityRepository.findOne({ where: { id } });
     if (!university) {
       throw new NotFoundException(`University with ID ${id} not found`);
     }
@@ -28,7 +28,7 @@ export class UniversitiesService {
   }
 
   async findExistingOneByName(name: string): Promise<University | undefined> {
-    return this.universitiesRepository.findOne({ where: { name } });
+    return this.universityRepository.findOne({ where: { name } });
   }
 
 }

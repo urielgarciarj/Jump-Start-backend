@@ -26,10 +26,10 @@ export class Company {
     @Column()
     sede: string;
 
-    @Column()
-    specialties: string;
+    @Column({ nullable: true})
+    specialties?: string;
 
-    @Column()
-    logo: string;
+    @Column({ nullable: true})
+    logo?: string;
     
 }

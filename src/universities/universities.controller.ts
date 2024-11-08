@@ -23,11 +23,7 @@ export class UniversitiesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    const university = this.universitiesService.findOne(+id);
-    if (!university) {
-      
-    }
-    return university;
+    return this.universitiesService.findOne(+id);
   }
 
 }
