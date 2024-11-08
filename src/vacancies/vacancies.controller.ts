@@ -36,6 +36,13 @@ export class VacanciesController {
     return this.vacanciesService.findAllByRecruiterSorted(Number(id));
   }
 
+  // Get all vacancies related to a user by its id sorted by status, only active vacancies
+  @Get('list/active/:id')
+  findAllActiveByRecruiter(@Param('id') id: string) {
+    console.log('Getting all active vacancies by one recruiter!');
+    return this.vacanciesService.findAllActiveByRecruiter(Number(id));
+  }
+
   // Get all vacancies
   @Get('list')
   findAll() {
@@ -43,11 +50,18 @@ export class VacanciesController {
     return this.vacanciesService.findAll();
   }
 
-  // Get all vacancies sorted by status
+  // Get all vacancies sorted by status, all vacancies included active and inactive
   @Get('sorted')
   async findAllSortedByStatus(): Promise<Vacant[]> {
     console.log('Getting all vacancies sorted by status!');
     return this.vacanciesService.findAllSortedByStatus();
+  }
+
+  // Get all vacancies sorted by status, only active vacancies
+  @Get('sorted/active')
+  async findAllActive(): Promise<Vacant[]> {
+    console.log('Getting all active vacancies!');
+    return this.vacanciesService.findAllActive();
   }
 
   // Update fields from a vacant by id

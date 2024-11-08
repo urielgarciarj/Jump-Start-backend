@@ -59,7 +59,7 @@ export class VacanciesService {
     return this.vacanciesRepository.find({ where: { user: user } });
   }
 
-  // Get all vacancies related to a recruiter sorted by status
+  // Get all vacancies related to a recruiter sorted by status, first the ones on "active"
   async findAllByRecruiterSorted(userId: number): Promise<Vacant[]> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
@@ -85,12 +85,29 @@ export class VacanciesService {
     });
   }
 
+  // Get all vacancies related to a recruiter sorted by status, only active vacants
+  async findAllActiveByRecruiter(userId: number): Promise<Vacant[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (user.role !== 'reclutador') {
+      throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+    }
+
+    return this.vacanciesRepository.find({
+      where: { user: user, status: 'activo' },
+    });
+  }
+
   // Get all vacancies
   async findAll(): Promise<Vacant[]> {
     return this.vacanciesRepository.find();
   }
 
-  // Get all vacancies sorted by status
+  // Get all vacancies sorted by status, first the ones on "active"
   async findAllSortedByStatus(): Promise<Vacant[]> {
     const vacancies = await this.vacanciesRepository.find();
     return vacancies.sort((a, b) => {
@@ -102,6 +119,11 @@ export class VacanciesService {
       }
       return 0;
     });
+  }
+
+  // Get all vacancies sorted by status, only active vacants
+  async findAllActive(): Promise<Vacant[]> {
+    return this.vacanciesRepository.find({ where: { status: 'activo' } });
   }
 
   // Update fields from a vacant by id
