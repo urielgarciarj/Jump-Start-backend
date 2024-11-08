@@ -10,6 +10,7 @@ import {
 import { VacanciesService } from './vacancies.service';
 import { CreateVacantDto } from './dto/create-vacant.dto';
 import { UpdateVacantDto } from './dto/update-vacant.dto';
+import { SearchVacantDto } from './dto/search-vacant.dto';
 import { Vacant } from './vacancies.entity';
 
 @Controller('vacancies')
@@ -79,4 +80,12 @@ export class VacanciesController {
     console.log('Deleting vacant!');
     return this.vacanciesService.remove(Number(id));
   }
+
+  // Search vacancies by title, category, modality, and location
+  @Post('search')
+  async searchVacancies(@Body() searchVacantDto: SearchVacantDto): Promise<Vacant[]> {
+    console.log('Searching vacancies!');
+    return this.vacanciesService.searchVacancies(searchVacantDto);
+  }
+
 }

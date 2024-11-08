@@ -9,6 +9,7 @@ import { Vacant } from './vacancies.entity';
 import { User } from '../users/user.entity';
 import { CreateVacantDto } from './dto/create-vacant.dto';
 import { UpdateVacantDto } from './dto/update-vacant.dto';
+import { SearchVacantDto } from './dto/search-vacant.dto';
 
 @Injectable()
 export class VacanciesService {
@@ -154,5 +155,38 @@ export class VacanciesService {
     }
 
     await this.vacanciesRepository.remove(vacant);
+  }
+
+  // Search vacancies by title, category, modality, and location
+  async searchVacancies(searchVacantDto: SearchVacantDto): Promise<Vacant[]> {
+    const { title, category, modality, location } = searchVacantDto;
+
+    const queryBuilder = this.vacanciesRepository.createQueryBuilder('vacant');
+
+    queryBuilder.andWhere('vacant.status = :status', { status: 'activo' });
+
+    if (title) {
+      queryBuilder.andWhere('vacant.name LIKE :title', { title: `%${title}%` });
+    }
+
+    if (category) {
+      queryBuilder.andWhere('vacant.category LIKE :category', {
+        category: `%${category}%`,
+      });
+    }
+
+    if (modality) {
+      queryBuilder.andWhere('vacant.modality LIKE :modality', {
+        modality: `%${modality}%`,
+      });
+    }
+
+    if (location) {
+      queryBuilder.andWhere('vacant.location LIKE :location', {
+        location: `%${location}%`,
+      });
+    }
+
+    return queryBuilder.getMany();
   }
 }
