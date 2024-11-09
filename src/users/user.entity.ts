@@ -3,6 +3,7 @@ import { Project } from '../projects/project.entity';
 import { Class } from 'src/classes/classes.entity';
 import { Experience } from '../experiences/experience.entity';
 import { Profile } from 'src/profiles/profile.entity';
+import { Vacant } from '../vacancies/vacancies.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -37,4 +38,7 @@ export class User {
   @OneToOne(() => Profile, { cascade: true }) // Esto asegura que el perfil se guarde cuando el usuario se guarde
   @JoinColumn() // La clave foránea estará en la tabla User
   profile: Profile;
+
+  @OneToMany(() => Vacant, (vacant) => vacant.user)
+  vacancies: Vacant[];
 }

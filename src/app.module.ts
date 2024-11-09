@@ -9,6 +9,7 @@ import { ExperiencesModule } from './experiences/experiences.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { CompaniesModule } from './companies/companies.module';
+import { VacanciesModule } from './vacancies/vacancies.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -27,7 +28,8 @@ import { CompaniesModule } from './companies/companies.module';
     ClassesModule,
     ExperiencesModule,
     UniversitiesModule,
-    CompaniesModule],
+    CompaniesModule
+    VacanciesModule],
   controllers: [AppController],
   providers: [AppService],
 })
