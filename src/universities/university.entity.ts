@@ -29,6 +29,6 @@ export class University {
     @Column({ nullable: true})
     specialties?: string;
 
-    @Column({ nullable: true})
-    logo?: string;
+    @Column({ nullable: true })
+    logoUrl: string;
 }

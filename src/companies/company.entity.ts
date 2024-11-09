@@ -30,6 +30,6 @@ export class Company {
     specialties?: string;
 
     @Column({ nullable: true})
-    logo?: string;
+    logoUrl?: string;
     
 }

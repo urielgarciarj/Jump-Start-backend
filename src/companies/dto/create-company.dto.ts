@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-
 export class CreateCompanyDto {
     @IsNotEmpty()
     @IsString()
@@ -31,5 +30,5 @@ export class CreateCompanyDto {
 
     @IsOptional()
     @IsString()
-    logo?: string;
+    logoUrl?: string;
 }

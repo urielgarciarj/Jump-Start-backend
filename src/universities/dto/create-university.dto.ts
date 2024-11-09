@@ -30,5 +30,5 @@ export class CreateUniversityDto {
 
     @IsOptional()
     @IsString()
-    logo?: string;
+    logoUrl?: string;
 }
