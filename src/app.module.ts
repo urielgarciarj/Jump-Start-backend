@@ -28,7 +28,7 @@ import { VacanciesModule } from './vacancies/vacancies.module';
     ClassesModule,
     ExperiencesModule,
     UniversitiesModule,
-    CompaniesModule
+    CompaniesModule,
     VacanciesModule],
   controllers: [AppController],
   providers: [AppService],
