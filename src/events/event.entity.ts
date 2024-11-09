@@ -15,12 +15,21 @@ export class Event {
     @Column()
     startDate: Date;
   
-    @Column({ nullable: true })
+    @Column()
     endDate: Date;
   
-    @Column()
+    @Column({ nullable: true })
     university: string;
+
+    @Column({ nullable: true })
+    company: string;
+
+    @Column()
+    link: string;
   
+    @Column({ nullable: true })
+    mediaUrl: string;
+
     @ManyToOne(() => User, (user) => user.events)
     user: User; // Foreign key related to a user
 }

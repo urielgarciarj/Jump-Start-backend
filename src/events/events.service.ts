@@ -74,6 +74,7 @@ export class EventsService {
 
   // Get events within a specified date range, sorted by date (closest to farthest)
   async findEventsByDateRange(startDate: Date, endDate: Date): Promise<Event[]> {
+    console.log('entro event service')
     const queryBuilder = this.eventRepository.createQueryBuilder('event');
     queryBuilder.andWhere('event.status = :status', { status: 'active' });
     queryBuilder.andWhere('event.date BETWEEN :startDate AND :endDate', {

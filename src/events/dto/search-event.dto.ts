@@ -12,5 +12,5 @@ export class SearchEventDto {
     @IsNotEmpty()
     @IsDateString()
     startDate?: Date;
-
+    
 }

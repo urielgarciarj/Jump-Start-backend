@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseInterceptors } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event } from './event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -53,15 +53,15 @@ export class EventsController {
   }
 
    // Get all events sorted, including past and upcoming events
-  //  @Get('sorted')
-  //  async findAllSorted(
-  //    @Query('sort') sort: string,
-  //    @Query('dateRangeStart') dateRangeStart?: string,
-  //    @Query('dateRangeEnd') dateRangeEnd?: string,
-  //  ): Promise<Event[]> {
-  //    console.log('Getting all events with sorting and date range!');
-  //    return this.eventsService.findAllSorted(sort, dateRangeStart, dateRangeEnd);
-  //  }
+   @Get('sorted')
+   async findEventsByDateRange(
+    //  @Query('dateRangeStart') dateRangeStart?: Date,
+    //  @Query('dateRangeEnd') dateRangeEnd?: Date,
+     @Body() fechas: any, 
+   ): Promise<Event[]> {
+     console.log('Getting all events with sorting and date range!', fechas);
+     return this.eventsService.findEventsByDateRange(fechas.startDate, fechas.endDate);
+   }
 
   @Put('update/:id')
   async updateEvent(

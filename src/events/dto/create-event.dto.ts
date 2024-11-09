@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsOptional, IsDateString } from 'class-validator'
 export class CreateEventDto {
     @IsNotEmpty()
     @IsString()
-    title: string;
+    name: string;
 
     @IsNotEmpty()
     @IsString()
@@ -16,14 +16,6 @@ export class CreateEventDto {
     @IsNotEmpty()
     @IsString()
     category: string;
-
-    @IsNotEmpty()
-    @IsString()
-    organizer: string;
-    
-    @IsNotEmpty()
-    @IsString()
-    localization: string;
 
     @IsNotEmpty()
     @IsDateString()
@@ -39,11 +31,15 @@ export class CreateEventDto {
 
     @IsNotEmpty()
     @IsString()
-    link: string;
+    organizer: string;
 
     @IsNotEmpty()
     @IsString()
-    photo: string;
+    link: string;
+
+    // @IsNotEmpty()
+    // @IsString()
+    // photo: string;
 
     @IsNotEmpty()
     userId: number;
