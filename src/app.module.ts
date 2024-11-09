@@ -6,6 +6,9 @@ import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassesModule } from './classes/classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { UniversitiesModule } from './universities/universities.module';
+import { CompaniesModule } from './companies/companies.module';
 import { VacanciesModule } from './vacancies/vacancies.module';
 @Module({
   imports: [
@@ -20,10 +23,13 @@ import { VacanciesModule } from './vacancies/vacancies.module';
       synchronize: true,
     }),
     UsersModule,
+    ProfilesModule,
     ProjectModule,
     ClassesModule,
-    VacanciesModule,
-    ExperiencesModule],
+    ExperiencesModule,
+    UniversitiesModule,
+    CompaniesModule
+    VacanciesModule],
   controllers: [AppController],
   providers: [AppService],
 })

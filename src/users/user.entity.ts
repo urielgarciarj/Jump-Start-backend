@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { Class } from 'src/classes/classes.entity';
 import { Experience } from '../experiences/experience.entity';
+import { Profile } from 'src/profiles/profile.entity';
 import { Vacant } from '../vacancies/vacancies.entity';
 
 @Entity({ name: 'users' })
@@ -32,6 +33,11 @@ export class User {
 
   @OneToMany(() => Experience, (experience) => experience.user)
   experiences: Experience[];
+
+  // Relation 1:1 with Profile 
+  @OneToOne(() => Profile, { cascade: true }) // Esto asegura que el perfil se guarde cuando el usuario se guarde
+  @JoinColumn() // La clave foránea estará en la tabla User
+  profile: Profile;
 
   @OneToMany(() => Vacant, (vacant) => vacant.user)
   vacancies: Vacant[];
