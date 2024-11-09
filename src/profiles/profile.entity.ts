@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
 import { User } from '../users/user.entity';
+import { University } from 'src/universities/university.entity';
 
 @Entity({ name: 'profiles' })
 export class Profile {
