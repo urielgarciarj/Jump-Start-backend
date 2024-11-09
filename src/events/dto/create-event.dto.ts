@@ -11,6 +11,14 @@ export class CreateEventDto {
 
     @IsNotEmpty()
     @IsString()
+    status: string;
+
+    @IsNotEmpty()
+    @IsString()
+    category: string;
+
+    @IsNotEmpty()
+    @IsString()
     organizer: string;
     
     @IsNotEmpty()
@@ -38,5 +46,5 @@ export class CreateEventDto {
     photo: string;
 
     @IsNotEmpty()
-    teacherId: number;
+    userId: number;
 }
