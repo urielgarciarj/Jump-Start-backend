@@ -31,4 +31,13 @@ export class CompaniesService {
   async findExistingOneByName(name: string): Promise<Company | undefined> {
     return this.companyRepository.findOne({ where: { name } });
   }
+
+  async updateLogo(companyId: number, logoURL: string): Promise<Company> {
+    const company = await this.companyRepository.findOne({ where: { id: companyId } });
+    if (!company) {
+      throw new NotFoundException(`Company with ID ${companyId} not found`);
+    }
+    company.logoUrl = logoURL; // Update logo url
+    return this.companyRepository.save(company);
+  }
 }

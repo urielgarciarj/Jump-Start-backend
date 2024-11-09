@@ -10,6 +10,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { VacanciesModule } from './vacancies/vacancies.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -29,7 +30,8 @@ import { VacanciesModule } from './vacancies/vacancies.module';
     ExperiencesModule,
     UniversitiesModule,
     CompaniesModule,
-    VacanciesModule],
+    VacanciesModule,
+    FileUploadModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -31,4 +31,12 @@ export class UniversitiesService {
     return this.universityRepository.findOne({ where: { name } });
   }
 
+  async updateLogo(universityId: number, logoURL: string): Promise<University> {
+    const university = await this.universityRepository.findOne({ where: { id: universityId } });
+    if (!university) {
+      throw new NotFoundException(`University with ID ${universityId} not found`);
+    }
+    university.logoUrl = logoURL; // Update logo url
+    return this.universityRepository.save(university);
+  }
 }

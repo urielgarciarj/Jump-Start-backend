@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Profile } from './profile.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { User } from 'src/users/user.entity';
+import { profile } from 'console';
 
 @Injectable()
 export class ProfilesService {
@@ -38,5 +39,14 @@ export class ProfilesService {
       throw new NotFoundException(`Profile with ID ${id} not found`);
     }
     return profile;
+  }
+
+  async updateProfilePic(profileId: number, pictureURL: string): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { id: profileId } });
+    if (!profile) {
+      throw new NotFoundException(`Profile with ID ${profileId} not found`);
+    }
+    profile.picture = pictureURL; // Update picture url
+    return this.profileRepository.save(profile);
   }
 } 
