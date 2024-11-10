@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnsupportedMediaTypeException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
@@ -9,7 +9,7 @@ export class FileUploadService {
   static imageFileFilter(req, file, callback) {
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
-      return callback(new Error('Invalid file type'), false);
+      return callback(new UnsupportedMediaTypeException('Invalid file type'), false);
     }
     callback(null, true);
   }

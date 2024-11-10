@@ -3,6 +3,8 @@ import { CreateUniversityDto } from './dto/create-university.dto';
 import { University } from './university.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UniversitiesService {
@@ -35,6 +37,13 @@ export class UniversitiesService {
     const university = await this.universityRepository.findOne({ where: { id: universityId } });
     if (!university) {
       throw new NotFoundException(`University with ID ${universityId} not found`);
+    }
+    // Verify if existing logo
+    if (university.logoUrl) {
+      const filePath = path.resolve(__dirname, '..', '..', university.logoUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath); // Delete prev img
+      }
     }
     university.logoUrl = logoURL; // Update logo url
     return this.universityRepository.save(university);

@@ -4,6 +4,8 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './company.entity';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class CompaniesService {
@@ -36,6 +38,13 @@ export class CompaniesService {
     const company = await this.companyRepository.findOne({ where: { id: companyId } });
     if (!company) {
       throw new NotFoundException(`Company with ID ${companyId} not found`);
+    }
+    // Verify if existing logo
+    if (company.logoUrl) {
+      const filePath = path.resolve(__dirname, '..', '..', company.logoUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath); // Delete prev img
+      }
     }
     company.logoUrl = logoURL; // Update logo url
     return this.companyRepository.save(company);

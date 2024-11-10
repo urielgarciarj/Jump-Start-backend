@@ -4,7 +4,8 @@ import { Repository } from 'typeorm';
 import { Profile } from './profile.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { User } from 'src/users/user.entity';
-import { profile } from 'console';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ProfilesService {
@@ -45,6 +46,13 @@ export class ProfilesService {
     const profile = await this.profileRepository.findOne({ where: { id: profileId } });
     if (!profile) {
       throw new NotFoundException(`Profile with ID ${profileId} not found`);
+    }
+    // Verify if existing picture
+    if (profile.picture) {
+      const filePath = path.resolve(__dirname, '..', '..', profile.picture);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath); // Delete prev img
+      }
     }
     profile.picture = pictureURL; // Update picture url
     return this.profileRepository.save(profile);
