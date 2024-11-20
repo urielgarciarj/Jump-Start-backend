@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event } from './event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -10,58 +10,74 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post('create')
-  create(@Body() createEventDto: CreateEventDto) {
+  async create(@Body() createEventDto: CreateEventDto) {
+    console.log('Creating a new event');
     return this.eventsService.create(createEventDto);
   }
 
-  // Get all events related to a user by user id
-  @Get('user/:userId')
-  findAllByUser(@Param('userId') userId: string) {
+  // Get all events related to a user by userid
+  @Get('list/:id')
+  findAllByUser(@Param('id') id: string) {
     console.log('Getting all events by one user!');
-    return this.eventsService.findAllByUser(Number(userId));
+    return this.eventsService.findAllByUser(Number(id));
   }
  
-  // Get all events related to a user by user id with sorting
-  // @Get('user/:userId/sorted')
-  // findAllByUserSorted(
-  //   @Param('userId') userId: string,
-  //   @Query('sort') sort: string,
-  //   @Query('dateRangeStart') dateRangeStart?: string,
-  //   @Query('dateRangeEnd') dateRangeEnd?: string,
-  // ) {
-  //   console.log('Getting all events by user with sorting and date range!');
-  //   return this.eventsService.findAllByUserSorted(
-  //     Number(userId),
-  //     sort,
-  //     dateRangeStart,
-  //     dateRangeEnd,
-  //   );
+  // Get all events related to a user by its id sorted by status
+  // @Get('list/sorted/:id')
+  // findAllByEventSorted(@Param('id') id: string) {
+  //   console.log('Getting all vacancies by one recruiter sorted by status!');
+  //   return this.eventsService.findAllByEventSorted(Number(id)); 
   // }
 
   // Get a single event by id
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    console.log('Getting single event by ID!');
-    return this.eventsService.findOne(Number(id));
+  @Get('list/active/:id')
+  findAllActiveByEvent(@Param('id') id: string) {
+    console.log('Getting all active events by one recruiter');
+    return this.eventsService.findAllActiveByEvent(Number(id)); 
   }
 
   // Get all events
-  @Get()
+  @Get('list')
   findAll() {
     console.log('Getting all events!');
     return this.eventsService.findAll();
   }
 
-   // Get all events sorted, including past and upcoming events
+   // Get all events sorted, by status
    @Get('sorted')
-   async findEventsByDateRange(
-    //  @Query('dateRangeStart') dateRangeStart?: Date,
-    //  @Query('dateRangeEnd') dateRangeEnd?: Date,
-     @Body() fechas: any, 
-   ): Promise<Event[]> {
-     console.log('Getting all events with sorting and date range!', fechas);
-     return this.eventsService.findEventsByDateRange(fechas.startDate, fechas.endDate);
+   async findAllSortedByStatus(): Promise<Event[]> {
+     console.log('Getting all events with sorting and date range!');
+     return this.eventsService.findAllSortedByStatus();
    }
+
+  @Get('sorted/active')
+  async findAllActive(): Promise<Event[]> {
+    console.log('Getting all active vacancies!');
+    return this.eventsService.findAllActive();
+  }
+
+  @Get('date-range')
+  async getEventsByDateRange(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string
+  ) {
+    return this.eventsService.findEventsByDateRange(startDate, endDate);
+  }
+
+  @Get('start-date')
+  async getEventsByStartDate(@Query('startDate') startDate: string) {
+    return this.eventsService.findEventsByStartDate(startDate);
+  }
+
+  @Get('past-events')
+  async getPastEvents() {
+    return this.eventsService.findPastEvents();
+  }
+
+  @Get('upcoming-events')
+  async getUpcomingEvents() {
+    return this.eventsService.findUpcomingEvents();
+  }
 
   @Put('update/:id')
   async updateEvent(

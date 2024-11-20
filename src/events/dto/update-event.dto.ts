@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsDateString, IsArray, IsUrl, ArrayNotEmpty } from 'class-validator';
 
 export class UpdateEventDto  {
     @IsNotEmpty()
@@ -33,7 +33,9 @@ export class UpdateEventDto  {
     @IsString()
     link: string;
 
-    @IsNotEmpty()
-    @IsString()
-    photo: string;
+    @IsOptional()
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsUrl({}, { each: true })
+    links?: string[];
 }

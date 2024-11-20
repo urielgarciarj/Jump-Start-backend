@@ -37,9 +37,9 @@ export class CreateEventDto {
     @IsString()
     link: string;
 
-    // @IsNotEmpty()
-    // @IsString()
-    // photo: string;
+    @IsNotEmpty()
+    @IsString()
+    mediaUrl: string;
 
     @IsNotEmpty()
     userId: number;

@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Repository, MoreThan, LessThan, Between,Sort } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './event.entity';
 import { User } from '../users/user.entity';
@@ -14,18 +14,23 @@ export class EventsService {
     @InjectRepository(Event) private eventRepository: Repository<Event>
   ) {}
 
+  //create new event
   async create(createEventDto: CreateEventDto) {
     const user = await this.usersRepository.findOne({ where: { id: createEventDto.userId } });
     console.log('user', user);
 
-    if (!user || user.role !== 'reclutador') {
-      throw new NotFoundException(`User with ID ${createEventDto.userId} is not authorized to create events`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${createEventDto.userId} is not found`);
+    }
+    if(user.role !== 'reclutador'){
+      throw new ForbiddenException(`User with ID ${createEventDto.userId} is not a recruiter`,);
     }
     const event = this.eventRepository.create({
         ...createEventDto,
         user, 
-        // status: 'activo',
+        status: 'activo',
       });
+      
     return this.eventRepository.save(event);
   }
 
@@ -36,54 +41,116 @@ export class EventsService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
     
+    if(user.role !== 'reclutador'){
+      throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+    }
+
     return this.eventRepository.find({ where: { user: user } });
   }
 
- //get all events 
-  findAll(): Promise<Event[]> {
-    return this.eventRepository.find();
+  //get all events related to a user sorted by status 
+  // findAllByEventSorted(userId: number): Promise<Event[]> {
+  //   const user = await this.usersRepository.findOne({ where: { id: userId } });
+  //   if (!user) {
+  //     throw new NotFoundException(`User with ID ${userId} not found`);
+  //   }
+    
+  //   if(user.role !== 'reclutador'){
+  //     throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+  //   }
+    
+  //   const events = this.eventRepository.findOne({ where: { user: user} })
+
+  //   return events.sort((a, b) => {
+  //     if (a.status === 'activo' && b.status !== 'activo') {
+  //       return -1;
+  //     }
+  //     if (a.status !== 'activo' && b.status === 'activo') {
+  //       return 1;
+  //     }
+  //     return 0;
+  //   });
+  // }
+
+ //get all events only with status = activo
+ async findAllActiveByEvent(userId: number): Promise<Event[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (user.role !== 'reclutador') {
+      throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
+    }
+
+    return this.eventRepository.find({
+      where: { user: user, status: 'activo' },
+    });
   }
 
   // Get a single event by id
-  async findOne(id: number): Promise<Event> {
-    const event = await this.eventRepository.findOne({ where: { id } });
-
-    if (!event) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
-    }
-
-    return event;
+  async findAll(): Promise<Event[]> {
+    return this.eventRepository.find();
   }
 
-  // Get past or upcoming events, sorted by date (upcoming: closest to farthest)
-  async findEventsByDateStatus(isPast: boolean): Promise<Event[]> {
-    const now = new Date();
-
-    const queryBuilder = this.eventRepository.createQueryBuilder('event');
-    queryBuilder.andWhere('event.status = :status', { status: 'active' });
-
-    if (isPast) {
-      queryBuilder.andWhere('event.date < :now', { now });
-    } else {
-      queryBuilder.andWhere('event.date >= :now', { now });
-    }
-
-    queryBuilder.orderBy('event.date', 'ASC');
-    return queryBuilder.getMany();
+  // Get sorted status 
+  async findAllSortedByStatus(): Promise<Event[]> {
+    const vacancies = await this.eventRepository.find();
+    return vacancies.sort((a, b) => {
+      if (a.status === 'activo' && b.status !== 'activo') {
+        return -1;
+      }
+      if (a.status !== 'activo' && b.status === 'activo') {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   // Get events within a specified date range, sorted by date (closest to farthest)
-  async findEventsByDateRange(startDate: Date, endDate: Date): Promise<Event[]> {
-    console.log('entro event service')
-    const queryBuilder = this.eventRepository.createQueryBuilder('event');
-    queryBuilder.andWhere('event.status = :status', { status: 'active' });
-    queryBuilder.andWhere('event.date BETWEEN :startDate AND :endDate', {
-      startDate,
-      endDate,
-    });
-    queryBuilder.orderBy('event.date', 'ASC');
+  async findAllActive(): Promise<Event[]> {
+    return this.eventRepository.find({ where: { status: 'activo' } });
+  }
 
-    return queryBuilder.getMany();
+  // Get events by range dates 
+  async findEventsByDateRange(startDate: string, endDate: string): Promise<Event[]> {
+    return this.eventRepository.find({
+      where: {
+        startDate: Between(new Date(startDate), new Date(endDate)),
+      },
+    });
+  }
+
+  // Get events by start date
+  async findEventsByStartDate(startDate: string): Promise<Event[]> {
+    return this.eventRepository.find({
+      where: {
+        startDate: new Date(startDate),
+      },
+    });
+  }
+
+  //Get events by past dates
+  async findPastEvents(): Promise<Event[]> {
+    const today = new Date();
+    return this.eventRepository.find({
+      where: {
+        startDate: LessThan(today),
+      },
+      order: { startDate: 'DESC' },
+    });
+  }
+
+  //Get events by upcoming dates 
+  async findUpcomingEvents(): Promise<Event[]> {
+    const today = new Date();
+    return this.eventRepository.find({
+      where: {
+        startDate: MoreThan(today),
+      },
+      order: { startDate: 'ASC' },
+    });
   }
 
   //update an event by id 
@@ -107,10 +174,10 @@ export class EventsService {
     await this.eventRepository.remove(event);
   }
 
-  async searchEvents(searchEventDto: SearchEventDto): Promise<Event[]>{
-    const { title, category, startDate } = searchEventDto;
+  async searchEvents(searchVacantDto: SearchEventDto): Promise<Event[]> {
+    const { title, category, status, startDate } = searchVacantDto;
 
-    const queryBuilder = this.eventRepository.createQueryBuilder('event');
+    const queryBuilder = this.eventRepository.createQueryBuilder('vacant');
 
     queryBuilder.andWhere('event.status = :status', { status: 'activo' });
 
@@ -121,6 +188,12 @@ export class EventsService {
     if (category) {
       queryBuilder.andWhere('event.category LIKE :category', {
         category: `%${category}%`,
+      });
+    }
+
+    if (status) {
+      queryBuilder.andWhere('event.status LIKE :status', {
+        status: `%${status}%`,
       });
     }
 
