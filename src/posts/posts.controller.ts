@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Validation
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { SearchPostDto } from './dto/search-post.dto';
 import { Post_ } from './post.entity';
 
 @Controller('posts')
@@ -16,7 +17,7 @@ export class PostsController {
   }
 
   // Get all posts
-  @Get('list')
+  @Get('list/all')
   findAll() {
     return this.postsService.findAll();
   }
@@ -33,6 +34,30 @@ export class PostsController {
     return this.postsService.findAllByUser(Number(id));
   }
 
+  // Get posts sorted by creation date (oldest to newest)
+  @Get('list/sorted/creation-date')
+  findAllSortedByCreationDate() {
+    return this.postsService.findAllSortedByCreationDate();
+  }
+
+  // Get posts sorted by creation date (newest to oldest)
+  @Get('list/sorted/newest-date')
+  findAllSortedByNewestDate() {
+    return this.postsService.findAllSortedByNewestDate();
+  }
+
+  // Get posts sorted by creation date by id of user (oldest to newest)
+  @Get('list/sorted/creation-date/:id')
+  findAllSortedByCreationDateByUserId(@Param('id') id: string) {
+    return this.postsService.findAllByUserSortedByCreationDate(Number(id));
+  }
+
+  // Get posts sorted by creation date by id of user (newest to oldest)
+  @Get('list/sorted/newest-date/:id')
+  findAllSortedByNewestDateByUserId(@Param('id') id: string) {
+    return this.postsService.findAllByUserSortedByNewestDate(Number(id));
+  }
+
   // Update a post
   @Put('update/:id')
   async update(
@@ -47,4 +72,12 @@ export class PostsController {
   remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
   }
+
+  // Search posts by title and category
+  @Post('search')
+  async searchPosts(@Body() searchPostDto: SearchPostDto): Promise<Post_[]> {
+    console.log('Searching vacancies!');
+    return this.postsService.searchPosts(searchPostDto);
+  }
+
 }

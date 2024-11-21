@@ -3,6 +3,7 @@ import { CreatePostDto } from './create-post.dto';
 import {
     IsString,
     IsOptional,
+    IsDateString,
   } from 'class-validator';
 
 export class UpdatePostDto {
@@ -19,7 +20,7 @@ export class UpdatePostDto {
     mediaUrl?: string;
 
     @IsOptional()
-    @IsString()
+    @IsDateString()
     dateCreated?: Date;
 
     @IsOptional()

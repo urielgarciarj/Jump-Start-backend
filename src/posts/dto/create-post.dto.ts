@@ -14,8 +14,8 @@ export class CreatePostDto {
     mediaUrl: string;
 
     @IsNotEmpty()
-    @IsString()
-    dateCreated: Date;
+    @IsDateString()
+    dateCreated: string;
 
     @IsNotEmpty()
     @IsString()

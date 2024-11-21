@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity({ name: 'posts' })
@@ -15,7 +15,7 @@ export class Post_ {
     @Column()
     mediaUrl: string;
 
-    @Column()
+    @CreateDateColumn()
     dateCreated: Date;
 
     @Column()
