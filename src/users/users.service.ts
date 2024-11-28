@@ -4,14 +4,20 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { Profile } from 'src/profiles/profile.entity';
 
 @Injectable()
 export class UsersService {
 
-    constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+    constructor(
+      @InjectRepository(User) private userRepository: Repository<User>,
+      @InjectRepository(Profile) private profileRepository: Repository<Profile>,
+    ) {}
 
-    createUser(user: CreateUserDto) {
+    async createUser(user: CreateUserDto): Promise<User> {
+        const profile = new Profile();
         const newUser = this.userRepository.create(user);
+        newUser.profile = profile; // Asign the profile to user
         return this.userRepository.save(newUser);
     }
 
