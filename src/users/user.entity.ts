@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn
 import { Project } from '../projects/project.entity';
 import { Class } from 'src/classes/classes.entity';
 import { Experience } from '../experiences/experience.entity';
+import { Event } from '../events/event.entity';
 import { Profile } from 'src/profiles/profile.entity';
 import { Vacant } from '../vacancies/vacancies.entity';
 
@@ -33,6 +34,9 @@ export class User {
 
   @OneToMany(() => Experience, (experience) => experience.user)
   experiences: Experience[];
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 
   // Relation 1:1 with Profile 
   @OneToOne(() => Profile, { cascade: true }) // Esto asegura que el perfil se guarde cuando el usuario se guarde

@@ -6,10 +6,12 @@ import { ProjectModule } from './projects/project.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassesModule } from './classes/classes.module';
 import { ExperiencesModule } from './experiences/experiences.module';
+import { EventsModule } from './events/events.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { VacanciesModule } from './vacancies/vacancies.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -27,6 +29,7 @@ import { VacanciesModule } from './vacancies/vacancies.module';
     ProjectModule,
     ClassesModule,
     ExperiencesModule,
+    EventsModule,
     UniversitiesModule,
     CompaniesModule,
     VacanciesModule],
