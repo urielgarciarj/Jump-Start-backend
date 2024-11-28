@@ -11,6 +11,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { UniversitiesModule } from './universities/universities.module';
 import { CompaniesModule } from './companies/companies.module';
 import { VacanciesModule } from './vacancies/vacancies.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { VacanciesModule } from './vacancies/vacancies.module';
     EventsModule,
     UniversitiesModule,
     CompaniesModule,
-    VacanciesModule],
+    VacanciesModule,
+    PostsModule],
   controllers: [AppController],
   providers: [AppService],
 })

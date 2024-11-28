@@ -5,6 +5,7 @@ import { Experience } from '../experiences/experience.entity';
 import { Event } from '../events/event.entity';
 import { Profile } from 'src/profiles/profile.entity';
 import { Vacant } from '../vacancies/vacancies.entity';
+import { Post_ } from '../posts/post.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -45,4 +46,7 @@ export class User {
 
   @OneToMany(() => Vacant, (vacant) => vacant.user)
   vacancies: Vacant[];
+
+  @OneToMany(() => Post_, (post) => post.user)
+  posts: Post_[];
 }
