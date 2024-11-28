@@ -175,7 +175,7 @@ export class EventsService {
   }
 
   async searchEvents(searchVacantDto: SearchEventDto): Promise<Event[]> {
-    const { title, category, status, startDate } = searchVacantDto;
+    const { title, category, status, startDate, endDate } = searchVacantDto;
 
     const queryBuilder = this.eventRepository.createQueryBuilder('vacant');
 
@@ -200,6 +200,12 @@ export class EventsService {
     if (startDate) {
       queryBuilder.andWhere('event.startDate LIKE :startDate', {
         startDate: `%${startDate}%`,
+      });
+    }
+
+    if (endDate) {
+      queryBuilder.andWhere('event.endDate LIKE :endDate', {
+        endDate: `%${endDate}%`,
       });
     }
 

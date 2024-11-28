@@ -56,26 +56,26 @@ export class EventsController {
     return this.eventsService.findAllActive();
   }
 
-  @Get('date-range')
+  @Get('dateRange')
   async getEventsByDateRange(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string
-  ) {
+  ): Promise<Event[]> {
     return this.eventsService.findEventsByDateRange(startDate, endDate);
   }
 
-  @Get('start-date')
-  async getEventsByStartDate(@Query('startDate') startDate: string) {
+  @Get('startDate')
+  async getEventsByStartDate(@Query('startDate') startDate: string): Promise<Event[]> {
     return this.eventsService.findEventsByStartDate(startDate);
   }
 
-  @Get('past-events')
-  async getPastEvents() {
+  @Get('pastEvents')
+  async getPastEvents(): Promise<Event[]> {
     return this.eventsService.findPastEvents();
   }
 
-  @Get('upcoming-events')
-  async getUpcomingEvents() {
+  @Get('upcomingEvents')
+  async getUpcomingEvents(): Promise<Event[]> {
     return this.eventsService.findUpcomingEvents();
   }
 
