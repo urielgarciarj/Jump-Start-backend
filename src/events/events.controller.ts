@@ -46,7 +46,7 @@ export class EventsController {
    // Get all events sorted, by status
    @Get('sorted')
    async findAllSortedByStatus(): Promise<Event[]> {
-     console.log('Getting all events with sorting and date range!');
+     console.log('Getting all events with sorting!');
      return this.eventsService.findAllSortedByStatus();
    }
 
@@ -56,11 +56,18 @@ export class EventsController {
     return this.eventsService.findAllActive();
   }
 
+  @Get('sorted/cancelled')
+  async findAllCancelled(): Promise<Event[]> {
+    console.log('Getting all active vacancies!');
+    return this.eventsService.findAllCancelled();
+  }
+
   @Get('dateRange')
   async getEventsByDateRange(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string
   ): Promise<Event[]> {
+    console.log('Fechas recibidas', { startDate, endDate });
     return this.eventsService.findEventsByDateRange(startDate, endDate);
   }
 

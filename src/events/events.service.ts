@@ -113,13 +113,23 @@ export class EventsService {
     return this.eventRepository.find({ where: { status: 'activo' } });
   }
 
+  async findAllCancelled(): Promise<Event[]> {
+    return this.eventRepository.find({ where: { status: 'cancelado' } });
+  }
+
   // Get events by range dates 
   async findEventsByDateRange(startDate: string, endDate: string): Promise<Event[]> {
-    return this.eventRepository.find({
+    console.log('Eventos encontrados:');
+    const eventsDate = await this.eventRepository.find({
       where: {
-        startDate: Between(new Date(startDate), new Date(endDate)),
-      },
+        startDate: Between(
+          new Date(startDate), 
+          new Date(endDate)
+        ),
+      },   
     });
+    console.log('Eventos encontrados:', startDate, endDate, eventsDate);
+    return eventsDate;
   }
 
   // Get events by start date
