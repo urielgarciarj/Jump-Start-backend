@@ -65,15 +65,35 @@ export class PostCommentsService {
     return comments;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} postComment`;
+  async update(id: number, updatePostCommentDto: UpdatePostCommentDto) {
+    const comment = await this.findOne(id);
+
+    if (!comment) {
+      throw new NotFoundException(`Post comment with ID ${id} not found`);
+    }
+
+    const updatedComment = this.commentsRepository.merge(comment, updatePostCommentDto);
+    return this.commentsRepository.save(updatedComment);
   }
 
-  update(id: number, updatePostCommentDto: UpdatePostCommentDto) {
-    return `This action updates a #${id} postComment`;
+  async remove(id: number) {
+    const comment = await this.findOne(id);
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+
+    await this.commentsRepository.remove(comment);
+    return { message: `Comment with ID ${id} has been removed`, isRemoved: true };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} postComment`;
+  async findOne(id: number) {
+    const comment = await this.commentsRepository.findOne({ where: { id } });
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+
+    return comment;
   }
 }
