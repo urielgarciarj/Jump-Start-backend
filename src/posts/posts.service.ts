@@ -74,11 +74,24 @@ export class PostsService {
 
   // Get posts sorted by creation date (newest to oldest)
   async findAllSortedByNewestDate(): Promise<Post_[]> {
-    return this.postsRepository.find({
-      order: {
-        dateCreated: 'DESC',
-      },
-    });
+
+    const posts = await this.postsRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .orderBy('post.dateCreated', 'DESC')
+      .select([
+        'post.id',
+        'post.title',
+        'post.description',
+        'post.category',
+        'post.dateCreated',
+        'post.mediaUrl',
+        'user.id',
+        'user.name',
+        'user.lastName',
+      ])
+      .getMany();
+
+    return posts;
   }
 
   // Get posts sorted by creation date by id of user (oldest to newest)
