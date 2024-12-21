@@ -26,4 +26,10 @@ export class PostCommentsController {
   remove(@Param('id') id: string) {
     return this.postCommentsService.remove(+id);
   }
+
+
+  @Delete('remove/by-post/:id')
+  removeByPost(@Param('id') id: string) {
+    return this.postCommentsService.removeCommentsByPost(+id);
+  }
 }

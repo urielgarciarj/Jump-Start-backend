@@ -27,6 +27,15 @@ export class UsersService {
         return this.userRepository.findOne({ where: { email } });
     }
 
+    async findById(id: string): Promise<User | undefined> {
+      const user = await this.userRepository.createQueryBuilder('user')
+      .select(['user.name', 'user.lastName', 'user.email'])
+      .where('user.id = :id', { id })
+      .getOne();
+
+      return user;
+  }
+
     //update to compare user pass
     async validateUser(email: string, password: string): Promise<User | null> {
       const user = await this.findByEmail(email);
@@ -45,7 +54,7 @@ export class UsersService {
     // Método para generar un JWT después de la autenticación
     async login(user: User) {
       // Creamos el payload que quieres incluir en el token
-      const payload = { email: user.email, sub: user.id }; // 'sub' es generalmente el ID del usuario
+      const payload = { sub: user.id }; // 'sub' es generalmente el ID del usuario
       // Generamos el token JWT
       const access_token = this.jwtService.sign(payload);
       return { access_token };  // Lo devolvemos en la respuesta

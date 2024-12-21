@@ -87,6 +87,11 @@ export class PostCommentsService {
     return { message: `Comment with ID ${id} has been removed`, isRemoved: true };
   }
 
+  async removeCommentsByPost(postId: number) {
+    await this.commentsRepository.delete({ post: { id: postId } });
+    return { message: `Comments on post ${postId} has been removed`, isRemoved: true };
+  }
+
   async findOne(id: number) {
     const comment = await this.commentsRepository.findOne({ where: { id } });
 
