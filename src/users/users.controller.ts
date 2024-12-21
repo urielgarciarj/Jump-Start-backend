@@ -22,15 +22,16 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() user: ValidateExistingUser) {
-    console.log('email', user.email);
-    console.log('password', user.password);
-
     const isValidUser = await this.usersService.validateUser(user.email, user.password);
     if (!isValidUser) {
       throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
 
-    return { message: 'Login successful' };
+    // Si el usuario es válido, generamos el token
+    const { access_token } = await this.usersService.login(isValidUser);
+        
+    // Devolvemos el token JWT en la respuesta
+    return { access_token };
 
   }
 

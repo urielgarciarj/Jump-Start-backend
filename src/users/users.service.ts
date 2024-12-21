@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Profile } from 'src/profiles/profile.entity';
 
@@ -10,6 +11,7 @@ import { Profile } from 'src/profiles/profile.entity';
 export class UsersService {
 
     constructor(
+      private readonly jwtService: JwtService,
       @InjectRepository(User) private userRepository: Repository<User>,
       @InjectRepository(Profile) private profileRepository: Repository<Profile>,
     ) {}
@@ -26,12 +28,26 @@ export class UsersService {
     }
 
     //update to compare user pass
-    async validateUser(email: string, password: string): Promise<boolean> {
-        const user = await this.findByEmail(email);
-        if (!user) {
-          return false; // User not found
-        }
-        // Compare password
-        return await bcrypt.compare(password, user.password);
+    async validateUser(email: string, password: string): Promise<User | null> {
+      const user = await this.findByEmail(email);
+      if (!user) {
+        return null; // User not found
       }
+      // Verificamos la contraseña
+      const passwordMatches = await bcrypt.compare(password, user.password);
+      if (!passwordMatches) {
+        return null;
+      }
+
+      return user;
+    }
+
+    // Método para generar un JWT después de la autenticación
+    async login(user: User) {
+      // Creamos el payload que quieres incluir en el token
+      const payload = { email: user.email, sub: user.id }; // 'sub' es generalmente el ID del usuario
+      // Generamos el token JWT
+      const access_token = this.jwtService.sign(payload);
+      return { access_token };  // Lo devolvemos en la respuesta
+    }
 }
