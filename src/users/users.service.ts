@@ -54,7 +54,7 @@ export class UsersService {
     // Método para generar un JWT después de la autenticación
     async login(user: User) {
       // Creamos el payload que quieres incluir en el token
-      const payload = { sub: user.id }; // 'sub' es generalmente el ID del usuario
+      const payload = { sub: user.id, role: user.role }; // 'sub' es generalmente el ID del usuario
       // Generamos el token JWT
       const access_token = this.jwtService.sign(payload);
       return { access_token };  // Lo devolvemos en la respuesta
