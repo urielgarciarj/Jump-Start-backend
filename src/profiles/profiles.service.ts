@@ -42,10 +42,15 @@ export class ProfilesService {
     return this.profileRepository.save(profile);
   }
 
-  // Upload a profile image
-  async uploadFile(file: Express.Multer.File): Promise<string> {
+  // Upload a profile image and update the profile with the image URL
+  async uploadFile(userId: number, file: Express.Multer.File): Promise<string> {
     if (!file) {
       throw new HttpException('File is not provided', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
     const fileName = `${Date.now()}_${file.originalname}`;
@@ -58,7 +63,17 @@ export class ProfilesService {
 
     try {
       await this.s3Client.send(new PutObjectCommand(params));
-      return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+      const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+      // Update the profile with the image URL
+      const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+      if (!profile) {
+        throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+      }
+      profile.picture = fileUrl;
+      await this.profileRepository.save(profile);
+
+      return fileUrl;
     } catch (error) {
       throw new HttpException(
         'Failed to upload file',
