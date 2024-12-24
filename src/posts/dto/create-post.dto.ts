@@ -9,7 +9,7 @@ export class CreatePostDto {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     mediaUrl: string;
 

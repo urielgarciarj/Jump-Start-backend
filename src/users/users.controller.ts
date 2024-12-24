@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Get, Param } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ValidateExistingUser } from './dto/validate-existing-user.dto';
 import { UsersService } from './users.service';
@@ -22,16 +22,21 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() user: ValidateExistingUser) {
-    console.log('email', user.email);
-    console.log('password', user.password);
-
     const isValidUser = await this.usersService.validateUser(user.email, user.password);
     if (!isValidUser) {
       throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
 
-    return { message: 'Login successful' };
+    // Si el usuario es válido, generamos el token
+    const { access_token } = await this.usersService.login(isValidUser);
+        
+    // Devolvemos el token JWT en la respuesta
+    return { access_token };
 
   }
 
+  @Get('user/:id')
+  async getUserById(@Param('id') id: string) {
+    return this.usersService.findById(id);
+  }
 }

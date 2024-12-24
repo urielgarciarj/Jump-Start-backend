@@ -6,12 +6,14 @@ import { User } from '../users/user.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
+import { PostComment } from 'src/post-comments/post-comment.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post_) private postsRepository: Repository<Post_>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(PostComment) private commentsRepository: Repository<PostComment>,
   ) {}
 
   // Create a new post
@@ -74,11 +76,24 @@ export class PostsService {
 
   // Get posts sorted by creation date (newest to oldest)
   async findAllSortedByNewestDate(): Promise<Post_[]> {
-    return this.postsRepository.find({
-      order: {
-        dateCreated: 'DESC',
-      },
-    });
+
+    const posts = await this.postsRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .orderBy('post.dateCreated', 'DESC')
+      .select([
+        'post.id',
+        'post.title',
+        'post.description',
+        'post.category',
+        'post.dateCreated',
+        'post.mediaUrl',
+        'user.id',
+        'user.name',
+        'user.lastName',
+      ])
+      .getMany();
+
+    return posts;
   }
 
   // Get posts sorted by creation date by id of user (oldest to newest)
@@ -135,11 +150,12 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
-
+    // Delete comments
+    await this.commentsRepository.delete({ post: { id: id } });
     await this.postsRepository.remove(post);
     return { message: `Post with ID ${id} has been removed` };
   }
-
+  
   // Search posts by title and category
   async searchPosts(searchPostDto: SearchPostDto): Promise<Post_[]> {
     const { title, category } = searchPostDto;
