@@ -50,6 +50,7 @@ export class PostCommentsService {
 
     const comments = await this.commentsRepository.createQueryBuilder('comment')
       .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
       .where('comment.postId = :postId', { postId })
       .orderBy('comment.dateCreated', 'DESC')
       .select([
@@ -59,6 +60,7 @@ export class PostCommentsService {
         'user.id',
         'user.name',
         'user.lastName',
+        'profile.picture',
       ])
       .getMany();
 

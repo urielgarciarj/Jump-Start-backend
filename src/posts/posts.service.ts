@@ -79,6 +79,7 @@ export class PostsService {
 
     const posts = await this.postsRepository.createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
       .orderBy('post.dateCreated', 'DESC')
       .select([
         'post.id',
@@ -90,6 +91,7 @@ export class PostsService {
         'user.id',
         'user.name',
         'user.lastName',
+        'profile.picture',
       ])
       .getMany();
 
