@@ -44,7 +44,27 @@ export class PostsService {
       user,
     });
 
-    return this.postsRepository.save(newPost);
+    const savedPost =  this.postsRepository.save(newPost);
+
+    const postWithPicture = await this.postsRepository.createQueryBuilder('post')
+    .leftJoinAndSelect('post.user', 'user')
+    .leftJoinAndSelect('user.profile', 'profile')
+    .where('post.id = :id', { id: (await savedPost).id })
+    .select([
+      'post.id',
+      'post.title',
+      'post.description',
+      'post.category',
+      'post.dateCreated',
+      'post.mediaUrl',
+      'user.id',
+      'user.name',
+      'user.lastName',
+      'profile.picture',
+    ])
+    .getOne();
+
+  return postWithPicture; 
   }
 
   // Upload img
@@ -80,7 +100,7 @@ export class PostsService {
       const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/posts/${fileName}`;
 
       // Si el post ya tiene una imagen, eliminar la antigua (opcional)
-      if (post.mediaUrl) {
+      if (post.mediaUrl && post.mediaUrl != '') {
         await this.deleteFileFromS3(post.mediaUrl);
       }
 
@@ -208,16 +228,6 @@ export class PostsService {
   }
 
   // Update fields from a post by id
-  // async update(id: number, updatePostDto: UpdatePostDto) {
-  //   const post = await this.findOne(id);
-
-  //   if (!post) {
-  //     throw new NotFoundException(`Post with ID ${id} not found`);
-  //   }
-
-  //   const updatedPost = this.postsRepository.merge(post, updatePostDto);
-  //   return this.postsRepository.save(updatedPost);
-  // }
   async update(id: number, updatePostDto: UpdatePostDto, file: Express.Multer.File): Promise<Post_> {
     const post = await this.postsRepository.findOne({ where: { id } });
 
