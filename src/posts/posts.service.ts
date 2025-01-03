@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, InternalServerErrorException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post_ } from './post.entity';
@@ -7,14 +7,25 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { PostComment } from 'src/post-comments/post-comment.entity';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class PostsService {
+  private s3Client: S3Client;
+  private bucketName = process.env.AWS_BUCKET_NAME;
   constructor(
     @InjectRepository(Post_) private postsRepository: Repository<Post_>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(PostComment) private commentsRepository: Repository<PostComment>,
-  ) {}
+  ) {
+    this.s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+  }
 
   // Create a new post
   async create(createPostDto: CreatePostDto) {
@@ -36,6 +47,68 @@ export class PostsService {
     return this.postsRepository.save(newPost);
   }
 
+  // Upload img
+  
+  // Función para subir la imagen y actualizar el post
+  async uploadFile(postId: number, file: Express.Multer.File): Promise<string> {
+    if (!file) {
+      throw new HttpException('File is not provided', HttpStatus.BAD_REQUEST);
+    }
+
+    // Buscar el post por ID
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found`);
+    }
+
+    // Generar un nombre único para el archivo
+    const fileName = `${Date.now()}_${file.originalname}`;
+
+    // Parámetros para subir el archivo a S3
+    const params = {
+      Bucket: this.bucketName,
+      Key: `posts/${fileName}`, // Guardar en una carpeta 'posts/'
+      Body: file.buffer,
+      ContentType: file.mimetype
+    };
+
+    try {
+      // Subir el archivo a S3
+      await this.s3Client.send(new PutObjectCommand(params));
+
+      // Generar la URL del archivo
+      const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/posts/${fileName}`;
+
+      // Si el post ya tiene una imagen, eliminar la antigua (opcional)
+      if (post.mediaUrl) {
+        await this.deleteFileFromS3(post.mediaUrl);
+      }
+
+      // Actualizar el post con la nueva URL de la imagen
+      post.mediaUrl = fileUrl;
+      await this.postsRepository.save(post);
+      
+      return fileUrl; // Devolver la URL de la imagen subida
+    } catch (error) {
+      throw new HttpException('Failed to upload file', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // Función para eliminar un archivo de S3 (cuando se actualiza el post)
+  private async deleteFileFromS3(fileUrl: string): Promise<void> {
+    const key = fileUrl.split('.amazonaws.com/')[1]; // Extraer la clave del archivo desde la URL
+    const params = {
+      Bucket: this.bucketName,
+      Key: key,
+    };
+
+    try {
+      await this.s3Client.send(new DeleteObjectCommand(params));
+    } catch (error) {
+      console.error('Error deleting file from S3:', error);
+    }
+  }
+  
   // Get all posts
   async findAll(): Promise<Post_[]> {
     return this.postsRepository.find();

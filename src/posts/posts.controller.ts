@@ -1,19 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { Post_ } from './post.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   // Create a new post
+  // @Post('create')
+  // @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  // async create(@Body() createPostDto: CreatePostDto) {
+  //   return this.postsService.create(createPostDto);
+  // }
   @Post('create')
+  @UseInterceptors(FileInterceptor('file')) // 'file' es el campo de archivo en el formulario
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  async create(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.create(createPostDto);
+  async create(@Body() createPostDto: CreatePostDto, @UploadedFile() file: Express.Multer.File) {
+    const post = this.postsService.create(createPostDto);
+    
+    if (file) { // Si se sube un archivo, lo subimos a S3 y obtenemos la URL
+      const fileUrl = await this.postsService.uploadFile((await post).id, file); // Subimos la imagen
+      (await post).mediaUrl = fileUrl;
+    }
+    
+    return post;
   }
 
   // Get all posts
