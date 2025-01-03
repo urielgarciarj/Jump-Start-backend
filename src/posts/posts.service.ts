@@ -87,7 +87,7 @@ export class PostsService {
       // Actualizar el post con la nueva URL de la imagen
       post.mediaUrl = fileUrl;
       await this.postsRepository.save(post);
-      
+
       return fileUrl; // Devolver la URL de la imagen subida
     } catch (error) {
       throw new HttpException('Failed to upload file', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -208,15 +208,43 @@ export class PostsService {
   }
 
   // Update fields from a post by id
-  async update(id: number, updatePostDto: UpdatePostDto) {
-    const post = await this.findOne(id);
+  // async update(id: number, updatePostDto: UpdatePostDto) {
+  //   const post = await this.findOne(id);
+
+  //   if (!post) {
+  //     throw new NotFoundException(`Post with ID ${id} not found`);
+  //   }
+
+  //   const updatedPost = this.postsRepository.merge(post, updatePostDto);
+  //   return this.postsRepository.save(updatedPost);
+  // }
+  async update(id: number, updatePostDto: UpdatePostDto, file: Express.Multer.File): Promise<Post_> {
+    const post = await this.postsRepository.findOne({ where: { id } });
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    const updatedPost = this.postsRepository.merge(post, updatePostDto);
-    return this.postsRepository.save(updatedPost);
+    // Si hay una imagen nueva, manejarla
+    if (file) {
+      // Eliminar la imagen anterior si existe
+      if (post.mediaUrl) {
+        const fileName = post.mediaUrl.split('/').pop();
+        if (fileName) {
+          await this.deleteFileFromS3(fileName);
+        }
+      }
+
+      // Subir la nueva imagen y obtener la URL
+      const fileUrl = await this.uploadFile(post.id, file);
+      updatePostDto.mediaUrl = fileUrl; // Asignamos la URL de la imagen al DTO
+    }
+
+    // Actualizamos el post con los nuevos datos (incluida la nueva imagen, si se subió)
+    Object.assign(post, updatePostDto);
+    await this.postsRepository.save(post);
+
+    return post;
   }
 
   async remove(id: number) {
