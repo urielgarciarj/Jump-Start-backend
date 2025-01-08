@@ -13,8 +13,8 @@ export class Post_ {
     @Column()
     description: string;
 
-    @Column()
-    mediaUrl: string;
+    @Column({ nullable: true })
+    mediaUrl?: string;
 
     @CreateDateColumn()
     dateCreated: Date;

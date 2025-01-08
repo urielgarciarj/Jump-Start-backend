@@ -36,7 +36,24 @@ export class PostCommentsService {
       post
     });
 
-    return this.commentsRepository.save(newPost);
+    const savedComment =  this.commentsRepository.save(newPost);
+
+    const comment = await this.commentsRepository.createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('comment.id = :id', { id: (await savedComment).id })
+      .select([
+        'comment.id',
+        'comment.text',
+        'comment.dateCreated',
+        'user.id',
+        'user.name',
+        'user.lastName',
+        'profile.picture',
+      ])
+      .getOne();
+
+    return comment;
   }
 
   async findAllByPost(postId: number): Promise<PostComment[]> {
@@ -50,6 +67,7 @@ export class PostCommentsService {
 
     const comments = await this.commentsRepository.createQueryBuilder('comment')
       .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
       .where('comment.postId = :postId', { postId })
       .orderBy('comment.dateCreated', 'DESC')
       .select([
@@ -59,6 +77,7 @@ export class PostCommentsService {
         'user.id',
         'user.name',
         'user.lastName',
+        'profile.picture',
       ])
       .getMany();
 
