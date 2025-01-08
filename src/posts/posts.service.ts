@@ -154,8 +154,26 @@ export class PostsService {
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-
-    return this.postsRepository.find({ where: { user } });
+    const posts = await this.postsRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('post.user = :id', { id: userId })
+      .orderBy('post.dateCreated', 'DESC')
+      .select([
+        'post.id',
+        'post.title',
+        'post.description',
+        'post.category',
+        'post.dateCreated',
+        'post.mediaUrl',
+        'user.id',
+        'user.name',
+        'user.lastName',
+        'profile.picture',
+      ])
+      .getMany();
+    
+      return posts;
   }
 
   // Get posts sorted by creation date (oldest to newest)
