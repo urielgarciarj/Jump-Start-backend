@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, CreateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Application } from 'src/applications/application.entity';
 
 @Entity({ name: 'vacancies' })
 export class Vacant {
@@ -38,4 +39,7 @@ export class Vacant {
 
     @ManyToOne(() => User, (user) => user.vacancies)
     user: User; // Foreign key related to a user
+
+    @OneToMany(() => Application, application => application.vacante)
+    aplicaciones: Application[];
 }
