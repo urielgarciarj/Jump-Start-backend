@@ -5,6 +5,7 @@ import {
   IsUrl,
   ArrayNotEmpty,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateVacantDto {
@@ -16,17 +17,9 @@ export class CreateVacantDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  requiredSkills: string;
-
-  @IsNotEmpty()
-  @IsString()
-  status: string;
-
-  @IsNotEmpty()
-  @IsString()
-  location: string;
+  location?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -44,10 +37,14 @@ export class CreateVacantDto {
   @IsString()
   company: string;
 
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUrl({}, { each: true })
-  links: string[];
+  @IsOptional()
+  @IsNumber()
+  salary?: number;
+
+  // @IsArray()
+  // @ArrayNotEmpty()
+  // @IsUrl({}, { each: true })
+  // links: string[];
 
   @IsNotEmpty()
   userId: number;

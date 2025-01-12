@@ -42,7 +42,32 @@ export class VacanciesService {
       status: 'activo',
     });
 
-    return this.vacanciesRepository.save(newVacant);
+    const vacantSaved = this.vacanciesRepository.save(newVacant);
+
+    const vacantDetails = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .leftJoinAndSelect('user.profile', 'profile')
+    .where('vacant.id = :id', { id: (await vacantSaved).id })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+      'profile.picture',
+    ])
+    .getOne();
+
+    return vacantDetails; 
   }
 
   // Get all vacancies related to a recruiter

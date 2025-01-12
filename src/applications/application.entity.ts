@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn } from 'typeorm';
 import { Vacant } from "src/vacancies/vacancies.entity";
 import { User } from "src/users/user.entity";
 
-@Index('IDX_UNIQUE_USER_VACANT', ['usuario', 'vacante'], { unique: true })
-@Entity()
+@Index('IDX_UNIQUE_USER_VACANT', ['user', 'vacant'], { unique: true })
+@Entity('applications')
 export class Application {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,18 +13,24 @@ export class Application {
 
   @Column()
   email: string;
+  
+  @Column({ nullable: true })
+  phoneNumber?: string;
 
   @Column()
   interested: string;
 
-  @Column()
-  notes: string;
+  @Column({ nullable: true })
+  proficiency?: string;
 
+  @CreateDateColumn()
+  dateCreated: Date;
+    
   // Relación con Vacante
   @ManyToOne(() => Vacant, vacante => vacante.aplicaciones)
-  vacante: Vacant;
+  vacant: Vacant;
 
   // Relación con User (asumiendo que ya tienes una entidad User)
   @ManyToOne(() => User, user => user.applications)
-  usuario: User;
+  user: User;
 }

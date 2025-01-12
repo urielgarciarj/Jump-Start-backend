@@ -55,6 +55,6 @@ export class User {
   @OneToMany(() => PostComment, comment => comment.user)
   comments: Comment[];
 
-  @OneToMany(() => Application, application => application.usuario)
+  @OneToMany(() => Application, application => application.user)
   applications: Application[];
 }

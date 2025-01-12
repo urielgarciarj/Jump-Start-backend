@@ -19,7 +19,6 @@ export class VacanciesController {
 
   @Post('create')
   async create(@Body() createVacantDto: CreateVacantDto) {
-    console.log('Creating new vacant!');
     return this.vacanciesService.create(createVacantDto);
   }
 

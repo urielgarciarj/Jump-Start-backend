@@ -13,8 +13,8 @@ export class Vacant {
     @Column()
     description: string;
 
-    @Column()
-    location: string;
+    @Column({ nullable: true })
+    location?: string;
 
     @Column()
     category: string;
@@ -28,8 +28,8 @@ export class Vacant {
     @Column()
     company: string;
 
-    @Column()
-    salary: number;
+    @Column({ nullable: true })
+    salary?: number;
 
     @Column({ default: 'activo' })
     status: string;
@@ -40,6 +40,6 @@ export class Vacant {
     @ManyToOne(() => User, (user) => user.vacancies)
     user: User; // Foreign key related to a user
 
-    @OneToMany(() => Application, application => application.vacante)
+    @OneToMany(() => Application, application => application.vacant)
     aplicaciones: Application[];
 }
