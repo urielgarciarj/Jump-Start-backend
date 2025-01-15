@@ -6,6 +6,7 @@ import { Event } from '../events/event.entity';
 import { Profile } from 'src/profiles/profile.entity';
 import { Vacant } from '../vacancies/vacancies.entity';
 import { Post_ } from '../posts/post.entity';
+import { PostComment } from 'src/post-comments/post-comment.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -49,4 +50,7 @@ export class User {
 
   @OneToMany(() => Post_, (post) => post.user)
   posts: Post_[];
+
+  @OneToMany(() => PostComment, comment => comment.user)
+  comments: Comment[];
 }
