@@ -215,7 +215,6 @@ export class VacanciesService {
     if (!vacant) {
       throw new NotFoundException(`Vacant with ID ${id} not found`);
     }
-
     // Updated fields
     Object.assign(vacant, updateVacantDto);
 
