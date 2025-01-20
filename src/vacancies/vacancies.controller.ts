@@ -22,6 +22,12 @@ export class VacanciesController {
     return this.vacanciesService.create(createVacantDto);
   }
 
+  // Get a single vacant with its details by ID
+  @Get('vacant/detail/:id')
+  async findVacantDetailsById(@Param('id') id: string) {
+    return this.vacanciesService.findVacantDetailsById(Number(id));
+  }
+
   // Get all vacancies related to a user by its id
   @Get('list/:id')
   findAllByRecruiter(@Param('id') id: string) {

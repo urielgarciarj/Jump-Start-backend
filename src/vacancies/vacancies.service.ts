@@ -46,7 +46,6 @@ export class VacanciesService {
 
     const vacantDetails = await this.vacanciesRepository.createQueryBuilder('vacant')
     .leftJoinAndSelect('vacant.user', 'user')
-    .leftJoinAndSelect('user.profile', 'profile')
     .where('vacant.id = :id', { id: (await vacantSaved).id })
     .select([
       'vacant.id',
@@ -58,16 +57,44 @@ export class VacanciesService {
       'vacant.level',
       'vacant.company',
       'vacant.salary',
+      'vacant.salaryPeriod',
       'vacant.status',
       'vacant.createdAt',
       'user.id',
       'user.name',
       'user.lastName',
-      'profile.picture',
     ])
     .getOne();
 
     return vacantDetails; 
+  }
+
+  // Get vacant details by id 
+  async findVacantDetailsById(vacantId: number): Promise<Vacant | null> {
+
+    const vacantDetails = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.id = :id', { id: vacantId })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .getOne();
+
+    return vacantDetails || null;
   }
 
   // Get all vacancies related to a recruiter
@@ -149,7 +176,29 @@ export class VacanciesService {
 
   // Get all vacancies sorted by status, only active vacants
   async findAllActive(): Promise<Vacant[]> {
-    return this.vacanciesRepository.find({ where: { status: 'activo' } });
+    const activeVacants = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.status = :status', { status: 'activo' })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .getMany();
+
+    return activeVacants;
   }
 
   // Update fields from a vacant by id

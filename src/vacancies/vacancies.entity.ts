@@ -10,7 +10,7 @@ export class Vacant {
     @Column()
     name: string;
 
-    @Column()
+    @Column('text')
     description: string;
 
     @Column({ nullable: true })
@@ -30,6 +30,9 @@ export class Vacant {
 
     @Column({ nullable: true })
     salary?: number;
+
+    @Column({ nullable: true })
+    salaryPeriod: string;
 
     @Column({ default: 'activo' })
     status: string;

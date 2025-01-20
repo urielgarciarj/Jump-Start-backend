@@ -1,9 +1,6 @@
 import {
   IsNotEmpty,
   IsString,
-  IsArray,
-  IsUrl,
-  ArrayNotEmpty,
   IsOptional,
   IsNumber,
 } from 'class-validator';
@@ -41,10 +38,9 @@ export class CreateVacantDto {
   @IsNumber()
   salary?: number;
 
-  // @IsArray()
-  // @ArrayNotEmpty()
-  // @IsUrl({}, { each: true })
-  // links: string[];
+  @IsOptional()
+  @IsString()
+  salaryPeriod?: string;
 
   @IsNotEmpty()
   userId: number;

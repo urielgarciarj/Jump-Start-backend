@@ -68,7 +68,8 @@ export class ApplicationsService {
     return applicant;
   }
 
-  async getAllByVacant(id: number) {
+  async getAllByVacant(id: number): Promise<Application[] | []> {
+    
     const applicantionsArray = await this.applicationRepository.createQueryBuilder('application')
       .leftJoinAndSelect('application.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -89,7 +90,7 @@ export class ApplicationsService {
       ])
       .getMany();
 
-    return applicantionsArray;
+    return applicantionsArray || [];
   }
 
   // async getAllByUser(id: number) {
