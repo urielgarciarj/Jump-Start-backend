@@ -1,8 +1,8 @@
 import {
   IsString,
-  IsArray,
-  IsUrl,
-  ArrayNotEmpty,
+  // IsArray,
+  // IsUrl,
+  // ArrayNotEmpty,
   IsOptional,
 } from 'class-validator';
 
@@ -15,9 +15,9 @@ export class UpdateVacantDto {
   @IsString()
   description?: string;
 
-  @IsOptional()
-  @IsString()
-  requiredSkills?: string;
+  // @IsOptional()
+  // @IsString()
+  // requiredSkills?: string;
 
   @IsOptional()
   @IsString()
@@ -39,13 +39,13 @@ export class UpdateVacantDto {
   @IsString()
   level?: string;
 
-  @IsOptional()
-  @IsString()
-  company?: string;
+  // @IsOptional()
+  // @IsString()
+  // company?: string;
 
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUrl({}, { each: true })
-  links?: string[];
+  // @IsOptional()
+  // @IsArray()
+  // @ArrayNotEmpty()
+  // @IsUrl({}, { each: true })
+  // links?: string[];
 }

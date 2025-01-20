@@ -82,7 +82,7 @@ export class VacanciesController {
   // Delete a vacant by id
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
-    console.log('Deleting vacant!');
+    //console.log('Deleting vacant!');
     return this.vacanciesService.remove(Number(id));
   }
 

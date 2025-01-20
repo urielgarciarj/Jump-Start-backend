@@ -10,12 +10,14 @@ import { User } from '../users/user.entity';
 import { CreateVacantDto } from './dto/create-vacant.dto';
 import { UpdateVacantDto } from './dto/update-vacant.dto';
 import { SearchVacantDto } from './dto/search-vacant.dto';
+import { Application } from 'src/applications/application.entity';
 
 @Injectable()
 export class VacanciesService {
   constructor(
     @InjectRepository(Vacant) private vacanciesRepository: Repository<Vacant>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Application) private applicationRepository: Repository<Application>,
   ) {}
 
   // Create a new vacant
@@ -227,7 +229,8 @@ export class VacanciesService {
     if (!vacant) {
       throw new NotFoundException(`Vacant with ID ${id} not found`);
     }
-
+    // Remove applications related and the vacant record 
+    await this.applicationRepository.delete({ vacant: { id: id } });
     await this.vacanciesRepository.remove(vacant);
   }
 
