@@ -93,6 +93,28 @@ export class ApplicationsService {
     return applicantionsArray || [];
   }
 
+  async findByUserVacant(userid: number, vacantid: number): Promise<Application | undefined> {
+    const existingApplication = await this.applicationRepository.createQueryBuilder('application')
+      .leftJoinAndSelect('application.user', 'user')
+      .where('application.vacantId = :vacantId', { vacantId: vacantid })
+      .andWhere('user.id = :userId', { userId: userid })
+      .orderBy('application.dateCreated', 'DESC')
+      .select([
+        'application.id',
+        'application.name',
+        'application.email',
+        'application.phoneNumber',
+        'application.interested',
+        'application.proficiency',
+        'application.dateCreated',
+        'user.id',
+        'user.name',
+        'user.lastName',
+      ])
+      .getOne();
+
+    return existingApplication;
+  }
   // async getAllByUser(id: number) {
   //   const applicantionsArray = await this.applicationRepository.createQueryBuilder('application')
   //     .leftJoinAndSelect('application.user', 'user')
@@ -121,7 +143,7 @@ export class ApplicationsService {
     const application = await this.applicationRepository.findOne({ where: { id } });
 
     if (!application) {
-      throw new NotFoundException(`Comment with ID ${id} not found`);
+      throw new NotFoundException(`Application with ID ${id} not found`);
     }
 
     await this.applicationRepository.remove(application);
