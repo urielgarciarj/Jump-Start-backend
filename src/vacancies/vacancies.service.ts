@@ -198,6 +198,7 @@ export class VacanciesService {
       'user.name',
       'user.lastName',
     ])
+    .orderBy('vacant.createdAt', 'DESC')
     .getMany();
 
     return activeVacants;
