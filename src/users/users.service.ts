@@ -29,7 +29,7 @@ export class UsersService {
 
     async findById(id: string): Promise<User | undefined> {
       const user = await this.userRepository.createQueryBuilder('user')
-      .select(['user.name', 'user.lastName', 'user.email','profile.university', 'profile.jobCompany'])
+      .select(['user.name', 'user.lastName', 'user.email', 'user.role', 'profile.university', 'profile.jobCompany'])
       .leftJoin('user.profile', 'profile')
       .where('user.id = :id', { id })
       .getOne();
