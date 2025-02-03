@@ -10,12 +10,14 @@ import { User } from '../users/user.entity';
 import { CreateVacantDto } from './dto/create-vacant.dto';
 import { UpdateVacantDto } from './dto/update-vacant.dto';
 import { SearchVacantDto } from './dto/search-vacant.dto';
+import { Application } from 'src/applications/application.entity';
 
 @Injectable()
 export class VacanciesService {
   constructor(
     @InjectRepository(Vacant) private vacanciesRepository: Repository<Vacant>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Application) private applicationRepository: Repository<Application>,
   ) {}
 
   // Create a new vacant
@@ -42,7 +44,59 @@ export class VacanciesService {
       status: 'activo',
     });
 
-    return this.vacanciesRepository.save(newVacant);
+    const vacantSaved = this.vacanciesRepository.save(newVacant);
+
+    const vacantDetails = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.id = :id', { id: (await vacantSaved).id })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .getOne();
+
+    return vacantDetails; 
+  }
+
+  // Get vacant details by id 
+  async findVacantDetailsById(vacantId: number): Promise<Vacant | null> {
+
+    const vacantDetails = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.id = :id', { id: vacantId })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .getOne();
+
+    return vacantDetails || null;
   }
 
   // Get all vacancies related to a recruiter
@@ -124,7 +178,30 @@ export class VacanciesService {
 
   // Get all vacancies sorted by status, only active vacants
   async findAllActive(): Promise<Vacant[]> {
-    return this.vacanciesRepository.find({ where: { status: 'activo' } });
+    const activeVacants = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.status = :status', { status: 'activo' })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .orderBy('vacant.createdAt', 'DESC')
+    .getMany();
+
+    return activeVacants;
   }
 
   // Update fields from a vacant by id
@@ -139,7 +216,6 @@ export class VacanciesService {
     if (!vacant) {
       throw new NotFoundException(`Vacant with ID ${id} not found`);
     }
-
     // Updated fields
     Object.assign(vacant, updateVacantDto);
 
@@ -153,7 +229,8 @@ export class VacanciesService {
     if (!vacant) {
       throw new NotFoundException(`Vacant with ID ${id} not found`);
     }
-
+    // Remove applications related and the vacant record 
+    await this.applicationRepository.delete({ vacant: { id: id } });
     await this.vacanciesRepository.remove(vacant);
   }
 

@@ -13,6 +13,7 @@ import { CompaniesModule } from './companies/companies.module';
 import { VacanciesModule } from './vacancies/vacancies.module';
 import { PostsModule } from './posts/posts.module';
 import { PostCommentsModule } from './post-comments/post-comments.module';
+import { ApplicationsModule } from './applications/applications.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { PostCommentsModule } from './post-comments/post-comments.module';
     CompaniesModule,
     VacanciesModule,
     PostsModule,
-    PostCommentsModule],
+    PostCommentsModule,
+    ApplicationsModule],
   controllers: [AppController],
   providers: [AppService],
 })
