@@ -1,9 +1,10 @@
 import {
   IsString,
-  IsArray,
-  IsUrl,
-  ArrayNotEmpty,
+  // IsArray,
+  // IsUrl,
+  // ArrayNotEmpty,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 
 export class UpdateVacantDto {
@@ -14,10 +15,6 @@ export class UpdateVacantDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsOptional()
-  @IsString()
-  requiredSkills?: string;
 
   @IsOptional()
   @IsString()
@@ -40,12 +37,10 @@ export class UpdateVacantDto {
   level?: string;
 
   @IsOptional()
-  @IsString()
-  company?: string;
+  @IsNumber()
+  salary?: number;
 
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUrl({}, { each: true })
-  links?: string[];
+  @IsString()
+  salaryPeriod?: string;
 }

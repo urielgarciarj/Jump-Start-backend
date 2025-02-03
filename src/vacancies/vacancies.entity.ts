@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, CreateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Application } from 'src/applications/application.entity';
 
 @Entity({ name: 'vacancies' })
 export class Vacant {
@@ -9,11 +10,11 @@ export class Vacant {
     @Column()
     name: string;
 
-    @Column()
+    @Column('text')
     description: string;
 
-    @Column()
-    location: string;
+    @Column({ nullable: true })
+    location?: string;
 
     @Column()
     category: string;
@@ -27,8 +28,11 @@ export class Vacant {
     @Column()
     company: string;
 
-    @Column()
-    salary: number;
+    @Column({ nullable: true })
+    salary?: number;
+
+    @Column({ nullable: true })
+    salaryPeriod: string;
 
     @Column({ default: 'activo' })
     status: string;
@@ -38,4 +42,7 @@ export class Vacant {
 
     @ManyToOne(() => User, (user) => user.vacancies)
     user: User; // Foreign key related to a user
+
+    @OneToMany(() => Application, application => application.vacant)
+    aplicaciones: Application[];
 }
