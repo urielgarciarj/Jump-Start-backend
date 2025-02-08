@@ -23,10 +23,10 @@ export class ApplicationsController {
     return this.applicationsService.findByUserVacant(Number(userid), Number(vacantid));
   }
 
-  // @Get('list-by/user/:id')
-  // findAllByUser(@Param('id') id: string) {
-  //   return this.applicationsService.getAllByUser(Number(id));
-  // }
+  @Get('list-vacants/by-user/:id')
+  getVacantByStudent(@Param('id') id: string) {
+    return this.applicationsService.getVacanciesByUser(Number(id));
+  }
 
   @Delete('delete/:id')
   remove(@Param('id') id: string) {

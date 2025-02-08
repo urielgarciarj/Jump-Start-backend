@@ -115,29 +115,25 @@ export class ApplicationsService {
 
     return existingApplication;
   }
-  // async getAllByUser(id: number) {
-  //   const applicantionsArray = await this.applicationRepository.createQueryBuilder('application')
-  //     .leftJoinAndSelect('application.user', 'user')
-  //     .leftJoinAndSelect('user.profile', 'profile')
-  //     .where('application.userId = :userId', { id })
-  //     .orderBy('application.dateCreated', 'DESC')
-  //     .select([
-  //       'application.id',
-  //       'application.name',
-  //       'application.email',
-  //       'application.phoneNumber',
-  //       'application.interested',
-  //       'application.proficiency',
-  //       'application.dateCreated',
-  //       'user.id',
-  //       'user.name',
-  //       'user.lastName',
-  //       'profile.picture',
-  //     ])
-  //     .getMany();
+  
+  async getVacanciesByUser(userId: number): Promise<Vacant[]> {
+    const applications = await this.applicationRepository.find({
+      where: { user: { id: userId } },
+      relations: ['vacant', 'vacant.user'], // Asegúrate de cargar la vacante asociada con cada solicitud
+    });
 
-  //   return applicantionsArray;
-  // }
+    return applications.map(application => {
+      const vacant = application.vacant;
+      return {
+        ...vacant,
+        creator: {
+          id: vacant.user.id,  // ID del creador (userId)
+          name: vacant.user.name,  // Nombre del creador
+          lastname: vacant.user.lastName,  // Apellido del creador
+        }
+      };
+    });
+  }
 
   async remove(id: number) {
     const application = await this.applicationRepository.findOne({ where: { id } });

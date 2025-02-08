@@ -110,8 +110,31 @@ export class VacanciesService {
     if (user.role !== 'reclutador') {
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
-
-    return this.vacanciesRepository.find({ where: { user: user } });
+    
+    const vacancies = await this.vacanciesRepository.createQueryBuilder('vacant')
+    .leftJoinAndSelect('vacant.user', 'user')
+    .where('vacant.userId = :userId', { userId: userId })
+    .select([
+      'vacant.id',
+      'vacant.name',
+      'vacant.description',
+      'vacant.category',
+      'vacant.location',
+      'vacant.modality',
+      'vacant.level',
+      'vacant.company',
+      'vacant.salary',
+      'vacant.salaryPeriod',
+      'vacant.status',
+      'vacant.createdAt',
+      'user.id',
+      'user.name',
+      'user.lastName',
+    ])
+    .orderBy('vacant.createdAt', 'DESC')
+    .getMany();
+    
+    return vacancies;
   }
 
   // Get all vacancies related to a recruiter sorted by status, first the ones on "active"
