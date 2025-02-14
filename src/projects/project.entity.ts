@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne } from 'typeorm';
-=======
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
->>>>>>> Stashed changes
 import { User } from '../users/user.entity';
 
 @Entity({ name: 'projects' })
