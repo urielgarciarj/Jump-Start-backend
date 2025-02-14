@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Enroll } from 'src/enrolls/enroll.entity';
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -26,4 +27,7 @@ export class Project {
 
   @ManyToOne(() => User, user => user.projects)
   professor: User;
+
+  @OneToMany(() => Enroll, enroll => enroll.project)
+  enrolls: Enroll[];
 }
