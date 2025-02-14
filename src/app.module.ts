@@ -14,6 +14,7 @@ import { VacanciesModule } from './vacancies/vacancies.module';
 import { PostsModule } from './posts/posts.module';
 import { PostCommentsModule } from './post-comments/post-comments.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { EnrollsModule } from './enrolls/enrolls.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { ApplicationsModule } from './applications/applications.module';
     VacanciesModule,
     PostsModule,
     PostCommentsModule,
-    ApplicationsModule],
+    ApplicationsModule,
+    EnrollsModule],
   controllers: [AppController],
   providers: [AppService],
 })

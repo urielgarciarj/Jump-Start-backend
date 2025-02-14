@@ -30,7 +30,7 @@ export class Application {
   @ManyToOne(() => Vacant, vacante => vacante.aplicaciones)
   vacant: Vacant;
 
-  // Relación con User (asumiendo que ya tienes una entidad User)
+  // Relación con User (Owner - Reclutador)
   @ManyToOne(() => User, user => user.applications)
   user: User;
 }
