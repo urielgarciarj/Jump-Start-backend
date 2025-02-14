@@ -10,9 +10,8 @@ export class ProjectController {
     // Create a new project
     @Post('create')
     async create(@Body() createProjectDto: CreateProjectDto) {
-        console.log("Creating new project!")
-        const user = await this.projectService.findUserById(createProjectDto.idTeacher);
-        if (user.role !== 'docente') {
+        const user = await this.projectService.findUserById(+createProjectDto.idTeacher);
+        if (user.role.toLocaleLowerCase() !== 'docente') {
             throw new Error('Unauthorized: Only users with the "docente" role can create projects.');
         }
         return this.projectService.create(createProjectDto);

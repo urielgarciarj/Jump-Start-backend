@@ -18,9 +18,9 @@ export class ProjectService {
   // Create a new project
   async create(createProjectDto: CreateProjectDto) {
     const professor = await this.usersRepository.findOne({
-      where: { id: createProjectDto.idTeacher },
+      where: { id: +createProjectDto.idTeacher },
     });
-    if (!professor || professor.role !== 'docente') {
+    if (!professor || professor.role.toLocaleLowerCase() !== 'docente') {
       throw new Error(
         'Only users with the role of professor can create projects',
       );
