@@ -45,8 +45,30 @@ export class ProjectService {
   }
 
   // List all projects
-  findAll() {
-    return this.projectsRepository.find({ relations: ['professor'] });
+  async findAll() {
+    const projectsArray = await this.projectsRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.professor', 'professor')
+      .leftJoinAndSelect('professor.profile', 'profile')
+      .orderBy('project.dateCreated', 'DESC')
+      .select([
+        'project.id',
+        'project.name',
+        'project.status',
+        'project.category',
+        'project.description',
+        'project.requirements',
+        'project.startDate',
+        'project.endDate',
+        'project.dateCreated',
+        'professor.id',
+        'professor.name',
+        'professor.lastName',
+        'profile.picture',
+        'profile.university',
+      ])
+      .getMany();
+
+    return projectsArray || [];
   }
 
   // Get 1 project by id
@@ -80,7 +102,7 @@ export class ProjectService {
   }
 
   // Update a field from a project by id
-  async updateFields(id: string, updateData: { [key: string]: any }) {
+  async updateFields(id: string, updateProjectDto: UpdateProjectDto) {
     const project = await this.projectsRepository.findOne({
       where: { id: Number(id) },
     });
@@ -88,10 +110,8 @@ export class ProjectService {
       throw new Error('Project not found');
     }
 
-    // Update Field Values
-    Object.keys(updateData).forEach((key) => {
-      project[key] = updateData[key];
-    });
+    // Updated fields
+    Object.assign(project, updateProjectDto);
 
     return this.projectsRepository.save(project);
   }

@@ -10,13 +10,13 @@ export class Project {
   @Column()
   name: string;
 
-  @Column()
+  @Column('text')
   description: string;
 
   @Column()
   category: string;
 
-  @Column()
+  @Column('text')
   requirements: string;
 
   @Column({ default: 'pendiente' })

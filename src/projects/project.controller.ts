@@ -17,12 +17,6 @@ export class ProjectController {
         return this.projectService.create(createProjectDto);
     }
 
-    // Test
-    @Post('test')
-    Test() {
-        return "Hello from Projects";
-    }
-
     // List all projects
     @Get('list')
     findAll() {
@@ -31,9 +25,8 @@ export class ProjectController {
     }
 
     // Get 1 project by id
-    @Get(':id')
+    @Get('project/detail/:id')
     findOne(@Param('id') id: string) {
-        console.log("Getting project by id!")
         return this.projectService.findOne(Number(id));
     }
 
@@ -48,10 +41,9 @@ export class ProjectController {
     @Put('updateFields/:id')
     updateFields(
         @Param('id') id: string,
-        @Body() updateData: { [key: string]: any }
+        @Body() updateProjectDto: UpdateProjectDto
       ) {
-        console.log("Updating project fields!")
-        return this.projectService.updateFields(id, updateData);
+        return this.projectService.updateFields(id, updateProjectDto);
     }
 
     // Delete a project by id
