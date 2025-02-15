@@ -14,6 +14,9 @@ export class Enroll {
     @Column()
     comments: string;
 
+    @Column({ default: 'pendiente' })
+    status: string;
+
     @CreateDateColumn()
     dateCreated: Date;
 
