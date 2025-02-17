@@ -65,7 +65,7 @@ export class EnrollsService {
   }
 
   // Returns the enroll created for a proyect by a estudent
-  async findUserEnrollOnProject(userid: number, projectid: number) {
+  async findUserEnrollOnProject(userid: number, projectid: number): Promise<Enroll | undefined> {
     const existingEnroll = await this.enrollsRepository.createQueryBuilder('enroll')
       .leftJoinAndSelect('enroll.user', 'user')
       .where('enroll.projectId = :projectId', { projectId: projectid })

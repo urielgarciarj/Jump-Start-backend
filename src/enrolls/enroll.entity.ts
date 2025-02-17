@@ -25,6 +25,6 @@ export class Enroll {
     project: Project;
 
     // Relación con User (Owner - Docente)
-    @ManyToOne(() => User, user => user.applications)
+    @ManyToOne(() => User, user => user.enrolls)
     user: User;
 }
