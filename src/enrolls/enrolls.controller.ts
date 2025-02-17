@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { EnrollsService } from './enrolls.service';
 import { CreateEnrollDto } from './dto/create-enroll.dto';
 
@@ -10,6 +10,14 @@ export class EnrollsController {
   @Post('enroll')
   create(@Body() createEnrollDto: CreateEnrollDto) {
     return this.enrollsService.create(createEnrollDto);
+  }
+
+  // Updates the status of the enroll (acept/reject)
+  @Put('update-status/:enrollId/:status')
+  updateStatus(
+    @Param('enrollId') enrollid: string, @Param('status') status: string
+  ) {
+    return this.enrollsService.updateStatus(Number(enrollid), status);
   }
 
   // Return the enroll form that user sent to a single project 

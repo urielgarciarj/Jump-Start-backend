@@ -10,6 +10,10 @@ export class CreateEnrollDto {
     comments: string;
 
     @IsNotEmpty()
+    @IsString()
+    status: string;
+
+    @IsNotEmpty()
     @IsDateString()
     dateCreated: string;
     

@@ -53,6 +53,7 @@ export class EnrollsService {
         'enroll.id',
         'enroll.name',
         'enroll.comments',
+        'enroll.status',
         'enroll.dateCreated',
         'user.id',
         'user.name',
@@ -62,6 +63,23 @@ export class EnrollsService {
       .getOne();
 
     return enrollDetails;
+  }
+
+  // Updates the status (updated by a professor) (acepted/rejected)
+  async updateStatus(enrollId: number, status: string) {
+    // Validate existing enroll to update
+    const existingEnroll = await this.enrollsRepository.findOne({
+      where: { id: enrollId  }
+    });
+    if (!existingEnroll) {
+      throw new NotFoundException('Enroll not found');
+    }
+
+    // Actualizar el estado
+    existingEnroll.status = status;
+    await this.enrollsRepository.save(existingEnroll);
+    return existingEnroll;
+
   }
 
   // Returns the enroll created for a proyect by a estudent
@@ -75,6 +93,7 @@ export class EnrollsService {
         'enroll.id',
         'enroll.name',
         'enroll.comments',
+        'enroll.status',
         'enroll.dateCreated',
         'user.id',
         'user.name',
@@ -96,6 +115,7 @@ export class EnrollsService {
         'enroll.id',
         'enroll.name',
         'enroll.comments',
+        'enroll.status',
         'enroll.dateCreated',
         'user.id',
         'user.name',
