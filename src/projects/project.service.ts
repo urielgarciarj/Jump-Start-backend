@@ -67,7 +67,7 @@ export class ProjectService {
         'profile.university',
       ])
       .getMany();
-
+      
     return projectsArray || [];
   }
 

@@ -20,7 +20,6 @@ export class ProjectController {
     // List all projects
     @Get('list')
     findAll() {
-        console.log("Getting all projects!")
         return this.projectService.findAll();
     }
 
