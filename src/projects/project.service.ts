@@ -94,7 +94,7 @@ export class ProjectService {
     if (!professor) {
       throw new NotFoundException('Professor not found');
     }
-    if (professor.role !== 'docente') {
+    if (professor.role.toLocaleLowerCase() !== 'docente') {
       throw new Error('User is not a professor');
     }
     return this.projectsRepository.find({

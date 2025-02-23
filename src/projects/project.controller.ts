@@ -32,7 +32,6 @@ export class ProjectController {
     // Get all Ids from one professor by professor id
     @Get('list/:id')
     findAllByProfessor(@Param('id') id: string) {
-        console.log("Getting all projects by one professor!")
         return this.projectService.findAllByProfessor(Number(id));
     }
 
