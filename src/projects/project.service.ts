@@ -5,6 +5,7 @@ import { User } from '../users/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './project.entity';
+import { Enroll } from 'src/enrolls/enroll.entity';
 
 @Injectable()
 export class ProjectService {
@@ -13,6 +14,7 @@ export class ProjectService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Project) private projectsRepository: Repository<Project>,
+    @InjectRepository(Enroll) private enrollRepository: Repository<Enroll>,
   ) {}
 
   // Create a new project
@@ -67,7 +69,7 @@ export class ProjectService {
         'profile.university',
       ])
       .getMany();
-      
+
     return projectsArray || [];
   }
 
@@ -122,7 +124,8 @@ export class ProjectService {
     if (!project) {
       throw new Error('Project not found');
     }
-    console.log('Deleting project');
+    // Remove enrolls related and the project record 
+    await this.enrollRepository.delete({ project: { id: id } });
     await this.projectsRepository.remove(project);
   }
 }
