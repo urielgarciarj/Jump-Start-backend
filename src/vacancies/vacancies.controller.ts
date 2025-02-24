@@ -66,7 +66,6 @@ export class VacanciesController {
   // Get all vacancies sorted by status, only active vacancies
   @Get('sorted/active')
   async findAllActive(): Promise<Vacant[]> {
-    console.log('Getting all active vacancies!');
     return this.vacanciesService.findAllActive();
   }
 
