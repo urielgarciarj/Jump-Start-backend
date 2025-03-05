@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Profile } from 'src/profiles/profile.entity';
+import { profile } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +30,7 @@ export class UsersService {
 
     async findById(id: string): Promise<User | undefined> {
       const user = await this.userRepository.createQueryBuilder('user')
-      .select(['user.name', 'user.lastName', 'user.email', 'user.role', 'profile.university', 'profile.jobCompany'])
+      .select(['user.name', 'user.lastName', 'user.email', 'user.role', 'profile.university', 'profile.jobCompany', 'profile.id'])
       .leftJoin('user.profile', 'profile')
       .where('user.id = :id', { id })
       .getOne();
