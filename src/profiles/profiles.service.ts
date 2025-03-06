@@ -89,4 +89,30 @@ export class ProfilesService {
     }
     return profile;
   }
+
+  async updateSkills(userId: number, skills: string): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+    profile.skills = skills;
+    return this.profileRepository.save(profile);
+  }
+
+  async deleteSkills(userId: number): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+    profile.skills = null;
+    return this.profileRepository.save(profile);
+  }
+
+  async getSkills(userId: number): Promise<string> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+    return profile.skills;
+  }
 }

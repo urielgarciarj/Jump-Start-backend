@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Param, Patch, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Body, Param, Patch, Post, UseInterceptors, UploadedFile, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -30,6 +30,21 @@ export class ProfilesController {
   ) {
     const fileUrl = await this.profilesService.uploadFile(userId, file);
     return { message: 'File uploaded successfully', fileUrl };
+  }
+
+  @Patch('update-skills/:userId')
+  async updateSkills(@Param('userId') userId: number, @Body('skills') skills: string) {
+    return this.profilesService.updateSkills(userId, skills);
+  }
+
+  @Delete('delete-skills/:userId')
+  async deleteSkills(@Param('userId') userId: number) {
+    return this.profilesService.deleteSkills(userId);
+  }
+
+  @Get('skills/:userId')
+  async getSkills(@Param('userId') userId: number) {
+    return this.profilesService.getSkills(userId);
   }
 
   @Get(':id')

@@ -16,7 +16,7 @@ export class Profile {
     @Column({ nullable: true })
     phone?: string;
 
-    @Column({ nullable: true, type: 'text' })
+    @Column({ nullable: true, type: 'longtext' })
     skills?: string;
 
     @Column({ nullable: true })
