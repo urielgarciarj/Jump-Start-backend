@@ -2,6 +2,7 @@ import { Controller, Get, Body, Param, Patch, Post, UseInterceptors, UploadedFil
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { RemoveSkillsDto } from './dto/remove-skills.dto';
 import * as multer from 'multer';
 
 @Controller('profiles')
@@ -45,6 +46,14 @@ export class ProfilesController {
   @Get('skills/:userId')
   async getSkills(@Param('userId') userId: number) {
     return this.profilesService.getSkills(userId);
+  }
+
+  @Patch('remove-specific-skills/:userId')
+  async removeSpecificSkills(
+    @Param('userId') userId: number, 
+    @Body() removeSkillsDto: RemoveSkillsDto
+  ) {
+    return this.profilesService.removeSpecificSkills(userId, removeSkillsDto.skillsToRemove);
   }
 
   @Get(':id')

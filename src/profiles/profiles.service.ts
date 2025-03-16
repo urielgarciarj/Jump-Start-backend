@@ -115,4 +115,35 @@ export class ProfilesService {
     }
     return profile.skills;
   }
+
+  async removeSpecificSkills(userId: number, skillsToRemove: string): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+    
+    // Si no hay habilidades, no hay nada que eliminar
+    if (!profile.skills) {
+      return profile;
+    }
+    
+    // Convertir las cadenas de texto en arrays, eliminando espacios extras
+    const currentSkillsArray = profile.skills.split(',').map(skill => skill.trim());
+    const skillsToRemoveArray = skillsToRemove.split(',').map(skill => skill.trim());
+    
+    // Filtrar las habilidades que no están en la lista a eliminar
+    const updatedSkillsArray = currentSkillsArray.filter(
+      skill => !skillsToRemoveArray.includes(skill)
+    );
+    
+    // Convertir de nuevo a string
+    profile.skills = updatedSkillsArray.join(', ');
+    
+    // Si no quedan habilidades, establecer a null o cadena vacía
+    if (profile.skills.trim() === '') {
+      profile.skills = null;
+    }
+    
+    return this.profileRepository.save(profile);
+  }
 }
