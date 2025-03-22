@@ -44,11 +44,11 @@ export class GlobalSearchService {
     const proyectos = await this.projectRepository
       .createQueryBuilder('project')
       .select([
-        'project.id',
         'project.name',
         'project.status',
         `(CASE WHEN LOWER(project.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(project.description) LIKE :term THEN 1 ELSE 0 END) AS score`,
+         `CONCAT('http://localhost:5173/project/details/', project.id) AS href`,
         `'project' AS source`,
       ])
       .where(
@@ -66,6 +66,7 @@ export class GlobalSearchService {
         'user.role',
         `(CASE WHEN LOWER(user.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(user.lastName) LIKE :term THEN 1 ELSE 0 END) AS score`,
+        `CONCAT('http://localhost:5173/profile/', user.id) AS href`,
         `'user' AS source`,
       ])
       .where(
