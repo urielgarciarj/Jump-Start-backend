@@ -32,6 +32,7 @@ export class GlobalSearchService {
         'vacant.company',
         `(CASE WHEN LOWER(vacant.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(vacant.description) LIKE :term THEN 1 ELSE 0 END) AS score`,
+         `CONCAT('http://localhost:5173/vancants/searchresult/', vacant.id) AS href`,
         `'vacant' AS source`,
       ])
       .where(
