@@ -10,7 +10,7 @@ export class Post_ {
     @Column()
     title: string;
 
-    @Column()
+    @Column('text')
     description: string;
 
     @Column({ nullable: true })

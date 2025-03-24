@@ -15,6 +15,7 @@ import { PostsModule } from './posts/posts.module';
 import { PostCommentsModule } from './post-comments/post-comments.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { EnrollsModule } from './enrolls/enrolls.module';
+import { GlobalSearchModule } from './global-search/global-search.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { EnrollsModule } from './enrolls/enrolls.module';
     PostsModule,
     PostCommentsModule,
     ApplicationsModule,
-    EnrollsModule],
+    EnrollsModule,
+    GlobalSearchModule],
   controllers: [AppController],
   providers: [AppService],
 })
