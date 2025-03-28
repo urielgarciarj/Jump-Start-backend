@@ -14,6 +14,10 @@ export class CreateVacantDto {
   @IsString()
   description: string;
 
+  @IsNotEmpty()
+  @IsString()
+  requirements: string;
+
   @IsOptional()
   @IsString()
   location?: string;
