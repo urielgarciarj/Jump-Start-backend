@@ -3,6 +3,7 @@ import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectRecommendationsResponseDto } from './dto/project-recommendation.dto';
+import { ProjectUserRecommendationsResponseDto } from './dto/user-recommendation.dto';
 
 @Controller('projects')
 export class ProjectController {
@@ -42,6 +43,18 @@ export class ProjectController {
         @Param('userId') userId: string
     ): Promise<ProjectRecommendationsResponseDto> {
         return this.projectService.recommendProjects(Number(userId));
+    }
+
+    // Obtener usuarios recomendados para proyectos basado en sus habilidades
+    @Get('recommend-users')
+    getRecommendedUsers(): Promise<ProjectUserRecommendationsResponseDto> {
+        return this.projectService.recommendUsersForProjects();
+    }
+
+    // Obtener usuarios recomendados para un proyecto específico
+    @Get('recommend-users-for-project/:projectId')
+    getRecommendedUsersForProject(@Param('projectId') projectId: string) {
+        return this.projectService.recommendUsersForProject(Number(projectId));
     }
 
     // Verificar directamente la coincidencia entre un proyecto y habilidades específicas
