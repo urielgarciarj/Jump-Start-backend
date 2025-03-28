@@ -32,7 +32,7 @@ export class VacanciesService {
       );
     }
 
-    if (user.role !== 'reclutador') {
+    if (user.role.toLowerCase() !== 'reclutador') {
       throw new ForbiddenException(
         `User with ID ${createVacantDto.userId} is not a recruiter`,
       );
@@ -53,6 +53,7 @@ export class VacanciesService {
       'vacant.id',
       'vacant.name',
       'vacant.description',
+      'vacant.requirements',
       'vacant.category',
       'vacant.location',
       'vacant.modality',
@@ -81,6 +82,7 @@ export class VacanciesService {
       'vacant.id',
       'vacant.name',
       'vacant.description',
+      'vacant.requirements',
       'vacant.category',
       'vacant.location',
       'vacant.modality',
@@ -107,7 +109,7 @@ export class VacanciesService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    if (user.role !== 'reclutador') {
+    if (user.role.toLowerCase() !== 'reclutador') {
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
     
@@ -118,6 +120,7 @@ export class VacanciesService {
       'vacant.id',
       'vacant.name',
       'vacant.description',
+      'vacant.requirements',
       'vacant.category',
       'vacant.location',
       'vacant.modality',
@@ -145,7 +148,7 @@ export class VacanciesService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    if (user.role !== 'reclutador') {
+    if (user.role.toLowerCase() !== 'reclutador') {
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
 
@@ -171,7 +174,7 @@ export class VacanciesService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    if (user.role !== 'reclutador') {
+    if (user.role.toLowerCase() !== 'reclutador') {
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
 
@@ -208,6 +211,7 @@ export class VacanciesService {
       'vacant.id',
       'vacant.name',
       'vacant.description',
+      'vacant.requirements',
       'vacant.category',
       'vacant.location',
       'vacant.modality',
