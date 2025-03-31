@@ -33,6 +33,34 @@ export class ProfilesController {
     return { message: 'File uploaded successfully', fileUrl };
   }
 
+  // Subir CV en formato PDF
+  @Post('upload-cv/:userId')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 }, // Límite de 10MB para PDFs
+      fileFilter: (req, file, callback) => {
+        if (file.mimetype !== 'application/pdf') {
+          return callback(new Error('Solo se permiten archivos PDF'), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadCV(
+    @Param('userId') userId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const fileUrl = await this.profilesService.uploadCV(userId, file);
+    return { message: 'CV subido exitosamente', fileUrl };
+  }
+
+  // Obtener URL de descarga del CV
+  @Get('download-cv/:userId')
+  async downloadCV(@Param('userId') userId: number) {
+    return this.profilesService.getCV(userId);
+  }
+
   @Patch('update-skills/:userId')
   async updateSkills(@Param('userId') userId: number, @Body('skills') skills: string) {
     return this.profilesService.updateSkills(userId, skills);
