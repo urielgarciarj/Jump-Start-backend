@@ -31,6 +31,9 @@ export class Profile {
     @Column({ nullable: true })
     picture?: string;
 
+    @Column({ nullable: true })
+    cv?: string;
+
     @OneToOne(() => User, user => user.profile)
     user: User;
 }

@@ -82,6 +82,65 @@ export class ProfilesService {
     }
   }
 
+  // Upload a CV in PDF format and update the profile with the CV URL
+  async uploadCV(userId: number, file: Express.Multer.File): Promise<string> {
+    if (!file) {
+      throw new HttpException('Archivo no proporcionado', HttpStatus.BAD_REQUEST);
+    }
+
+    // Verificar que el archivo es un PDF
+    if (file.mimetype !== 'application/pdf') {
+      throw new HttpException('El archivo debe ser un PDF', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+
+    const fileName = `cv_${userId}_${Date.now()}.pdf`;
+    const params = {
+      Bucket: this.bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: 'application/pdf',
+    };
+
+    try {
+      await this.s3Client.send(new PutObjectCommand(params));
+      const fileUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+      // Actualizar el perfil con la URL del CV
+      const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+      if (!profile) {
+        throw new NotFoundException(`Perfil para usuario con ID ${userId} no encontrado`);
+      }
+      profile.cv = fileUrl;
+      await this.profileRepository.save(profile);
+
+      return fileUrl;
+    } catch (error) {
+      throw new HttpException(
+        'Error al subir el archivo de CV',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // Get the CV URL for a user
+  async getCV(userId: number): Promise<{ cvUrl: string }> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Perfil para usuario con ID ${userId} no encontrado`);
+    }
+
+    if (!profile.cv) {
+      throw new NotFoundException(`El usuario con ID ${userId} no tiene CV registrado`);
+    }
+
+    return { cvUrl: profile.cv };
+  }
+
   async findOne(id: number): Promise<Profile> {
     const profile = await this.profileRepository.findOne({ where: { id } });
     if (!profile) {
