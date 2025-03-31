@@ -75,6 +75,12 @@ export class VacanciesController {
     return this.vacanciesService.recommendStudentsForVacant(Number(vacantId));
   }
 
+  // Obtener vacantes recomendadas para un estudiante específico
+  @Get('recommend-vacants-for-student/:userId')
+  getRecommendedVacantsForStudent(@Param('userId') userId: string) {
+    return this.vacanciesService.recommendVacantsForStudent(Number(userId));
+  }
+
   // Update fields from a vacant by id
   @Put('update/:id')
   async updateVacant(

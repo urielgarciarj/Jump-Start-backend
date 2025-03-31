@@ -498,4 +498,210 @@ export class VacanciesService {
       recommendedStudents
     };
   }
+
+  /**
+   * Recomienda vacantes para un estudiante específico basado en un análisis avanzado de habilidades
+   * @param userId - ID del estudiante para el que se buscan vacantes recomendadas
+   * @returns Lista de vacantes recomendadas para el estudiante
+   */
+  async recommendVacantsForStudent(userId: number): Promise<any> {
+    // 1. Obtener el usuario estudiante
+    const student = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['profile']
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+
+    if (student.role !== 'Estudiante') {
+      return {
+        message: `El usuario con ID ${userId} no es un estudiante`,
+        student: {
+          id: student.id,
+          name: student.name,
+          lastName: student.lastName,
+          email: student.email
+        },
+        recommendedVacants: []
+      };
+    }
+
+    // 2. Obtener las habilidades base del estudiante
+    const baseSkills = student.profile?.skills || '';
+    
+    // Si el estudiante no tiene habilidades registradas, no podemos hacer recomendaciones precisas
+    if (!baseSkills) {
+      return {
+        message: 'No se pueden generar recomendaciones porque no tienes habilidades registradas',
+        student: {
+          id: student.id,
+          name: student.name,
+          lastName: student.lastName,
+          email: student.email
+        },
+        recommendedVacants: []
+      };
+    }
+
+    // 3. Obtener todas las vacantes activas
+    const activeVacants = await this.vacanciesRepository.find({
+      where: { status: 'activo' },
+      relations: ['user']
+    });
+
+    if (activeVacants.length === 0) {
+      return {
+        message: 'No hay vacantes activas disponibles para recomendaciones',
+        student: {
+          id: student.id,
+          name: student.name,
+          lastName: student.lastName,
+          email: student.email
+        },
+        recommendedVacants: []
+      };
+    }
+
+    // 4. Obtener aplicaciones existentes para excluir vacantes a las que ya aplicó
+    const studentApplications = await this.applicationRepository.find({
+      where: { user: { id: userId } },
+      relations: ['vacant']
+    });
+
+    // Extraer IDs de vacantes a las que ya aplicó
+    const appliedVacantIds = studentApplications.map(app => app.vacant.id);
+
+    // 5. Obtener inscripciones en proyectos para expandir el perfil de habilidades
+    const studentEnrollments = await this.enrollRepository.find({
+      where: { user: { id: userId } },
+      relations: ['project']
+    });
+
+    // 6. Crear perfil expandido del estudiante
+    // Normalizar habilidades base
+    const baseSkillsArray = baseSkills
+      .split(/[,;]+/)
+      .map(skill => skill.trim().toLowerCase())
+      .filter(skill => skill.length > 0);
+
+    // Inicializar el array de habilidades expandidas con las habilidades base
+    let expandedSkills = [...baseSkillsArray];
+
+    // Para cada proyecto en el que está inscrito, añadir sus requisitos
+    for (const enrollment of studentEnrollments) {
+      const project = await this.projectsRepository.findOne({
+        where: { id: enrollment.project.id }
+      });
+
+      if (project && project.requirements) {
+        const projectRequirements = project.requirements
+          .split(/[,;]+/)
+          .map(req => req.trim().toLowerCase())
+          .filter(req => req.length > 0);
+        
+        // Añadir los requisitos del proyecto a las habilidades expandidas
+        expandedSkills = [...expandedSkills, ...projectRequirements];
+      }
+    }
+
+    // 7. Calcular la frecuencia de cada habilidad
+    const skillFrequency: { [key: string]: number } = {};
+    expandedSkills.forEach(skill => {
+      skillFrequency[skill] = (skillFrequency[skill] || 0) + 1;
+    });
+
+    // 8. Evaluar cada vacante para el estudiante
+    const scoredVacants = activeVacants
+      // Filtrar vacantes a las que ya aplicó
+      .filter(vacant => !appliedVacantIds.includes(vacant.id))
+      .map(vacant => {
+        // Normalizar requisitos de la vacante
+        const vacantRequirements = vacant.requirements
+          .split(/[,;]+/)
+          .map(req => req.trim().toLowerCase())
+          .filter(req => req.length > 0);
+
+        // Si la vacante no tiene requisitos, no podemos hacer una recomendación precisa
+        if (vacantRequirements.length === 0) {
+          return {
+            vacant,
+            vacantRequirements,
+            matchScore: 0,
+            matchPercentage: 0,
+            matchingSkills: []
+          };
+        }
+
+        let matchScore = 0;
+        const matchingSkills: string[] = [];
+        
+        // Calcular puntuación basada en la frecuencia de habilidades
+        vacantRequirements.forEach(requirement => {
+          // Si el estudiante tiene esta habilidad
+          if (requirement in skillFrequency) {
+            // Añadir la frecuencia de esta habilidad a la puntuación
+            matchScore += skillFrequency[requirement];
+            // Registrar la habilidad coincidente
+            matchingSkills.push(requirement);
+          }
+        });
+
+        // Calcular un porcentaje: puntuación relativa al máximo posible
+        // El máximo posible sería tener todas las habilidades requeridas con la máxima frecuencia
+        const frequencyValues = Object.values(skillFrequency) as number[];
+        const maxFrequency = frequencyValues.length > 0 ? Math.max(...frequencyValues) : 1;
+        const maxPossibleScore = vacantRequirements.length * maxFrequency;
+        
+        const matchPercentage = maxPossibleScore > 0 ? 
+          (matchScore / maxPossibleScore) * 100 : 0;
+
+        return {
+          vacant: {
+            id: vacant.id,
+            name: vacant.name,
+            company: vacant.company,
+            description: vacant.description,
+            category: vacant.category,
+            modality: vacant.modality,
+            location: vacant.location,
+            level: vacant.level,
+            salary: vacant.salary,
+            salaryPeriod: vacant.salaryPeriod,
+            requirements: vacant.requirements
+          },
+          vacantRequirements,
+          recruiter: {
+            id: vacant.user.id,
+            name: vacant.user.name,
+            lastName: vacant.user.lastName
+          },
+          matchScore,
+          matchPercentage: Math.round(matchPercentage > 100 ? 100 : matchPercentage),
+          matchingSkills
+        };
+      })
+      // Ordenar por porcentaje de coincidencia (descendente)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+
+    // 9. Filtrar vacantes con un porcentaje de coincidencia de al menos 50%
+    const recommendedVacants = scoredVacants.filter(vacant => vacant.matchPercentage >= 50);
+
+    return {
+      message: recommendedVacants.length > 0 
+        ? `Se encontraron ${recommendedVacants.length} vacantes recomendadas para ti` 
+        : 'No se encontraron vacantes con al menos un 50% de coincidencia para tu perfil',
+      student: {
+        id: student.id,
+        name: student.name,
+        lastName: student.lastName,
+        email: student.email,
+        baseSkills: baseSkillsArray,
+        expandedSkills,
+        skillFrequency
+      },
+      recommendedVacants
+    };
+  }
 }
