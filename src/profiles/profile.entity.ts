@@ -16,7 +16,7 @@ export class Profile {
     @Column({ nullable: true })
     phone?: string;
 
-    @Column({ nullable: true, type: 'text' })
+    @Column({ nullable: true, type: 'longtext' })
     skills?: string;
 
     @Column({ nullable: true })
@@ -30,6 +30,21 @@ export class Profile {
 
     @Column({ nullable: true })
     picture?: string;
+
+    @Column({ nullable: true })
+    cv?: string;
+
+    @Column({ nullable: true })
+    facebook?: string;
+
+    @Column({ nullable: true })
+    twitter?: string;
+
+    @Column({ nullable: true })
+    linkedin?: string;
+
+    @Column({ nullable: true })
+    instagram?: string;
 
     @OneToOne(() => User, user => user.profile)
     user: User;

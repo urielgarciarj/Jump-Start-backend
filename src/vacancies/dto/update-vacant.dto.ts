@@ -18,6 +18,10 @@ export class UpdateVacantDto {
 
   @IsOptional()
   @IsString()
+  requirements?: string;
+
+  @IsOptional()
+  @IsString()
   status?: string;
 
   @IsOptional()

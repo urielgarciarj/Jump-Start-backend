@@ -8,6 +8,7 @@ import { Vacant } from '../vacancies/vacancies.entity';
 import { Post_ } from '../posts/post.entity';
 import { PostComment } from 'src/post-comments/post-comment.entity';
 import { Application } from 'src/applications/application.entity';
+import { Enroll } from 'src/enrolls/enroll.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -57,4 +58,7 @@ export class User {
 
   @OneToMany(() => Application, application => application.user)
   applications: Application[];
+  
+  @OneToMany(() => Enroll, enroll => enroll.user)
+  enrolls: Enroll[];
 }

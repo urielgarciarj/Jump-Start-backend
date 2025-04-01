@@ -13,6 +13,9 @@ export class Vacant {
     @Column('text')
     description: string;
 
+    @Column('text')
+    requirements: string;
+
     @Column({ nullable: true })
     location?: string;
 

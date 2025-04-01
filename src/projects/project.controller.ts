@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectRecommendationsResponseDto } from './dto/project-recommendation.dto';
+import { ProjectUserRecommendationsResponseDto } from './dto/user-recommendation.dto';
 
 @Controller('projects')
 export class ProjectController {
@@ -10,49 +12,67 @@ export class ProjectController {
     // Create a new project
     @Post('create')
     async create(@Body() createProjectDto: CreateProjectDto) {
-        console.log("Creating new project!")
-        const user = await this.projectService.findUserById(createProjectDto.idTeacher);
-        if (user.role !== 'docente') {
+        const user = await this.projectService.findUserById(+createProjectDto.idTeacher);
+        if (user.role.toLocaleLowerCase() !== 'docente') {
             throw new Error('Unauthorized: Only users with the "docente" role can create projects.');
         }
         return this.projectService.create(createProjectDto);
     }
 
-    // Test
-    @Post('test')
-    Test() {
-        return "Hello from Projects";
-    }
-
     // List all projects
     @Get('list')
     findAll() {
-        console.log("Getting all projects!")
         return this.projectService.findAll();
     }
 
     // Get 1 project by id
-    @Get(':id')
+    @Get('project/detail/:id')
     findOne(@Param('id') id: string) {
-        console.log("Getting project by id!")
         return this.projectService.findOne(Number(id));
     }
 
     // Get all Ids from one professor by professor id
     @Get('list/:id')
     findAllByProfessor(@Param('id') id: string) {
-        console.log("Getting all projects by one professor!")
         return this.projectService.findAllByProfessor(Number(id));
+    }
+
+    // Obtener proyectos recomendados para un usuario basado en sus habilidades
+    @Get('recommendations/:userId')
+    getRecommendedProjects(
+        @Param('userId') userId: string
+    ): Promise<ProjectRecommendationsResponseDto> {
+        return this.projectService.recommendProjects(Number(userId));
+    }
+
+    // Obtener usuarios recomendados para proyectos basado en sus habilidades
+    @Get('recommend-users')
+    getRecommendedUsers(): Promise<ProjectUserRecommendationsResponseDto> {
+        return this.projectService.recommendUsersForProjects();
+    }
+
+    // Obtener usuarios recomendados para un proyecto específico
+    @Get('recommend-users-for-project/:projectId')
+    getRecommendedUsersForProject(@Param('projectId') projectId: string) {
+        return this.projectService.recommendUsersForProject(Number(projectId));
+    }
+
+    // Verificar directamente la coincidencia entre un proyecto y habilidades específicas
+    @Get('match-skills/:projectId')
+    matchSkills(
+        @Param('projectId') projectId: string,
+        @Query('skills') skills: string
+    ) {
+        return this.projectService.debugMatchSkills(Number(projectId), skills);
     }
 
     // Update a field from a project by id
     @Put('updateFields/:id')
     updateFields(
         @Param('id') id: string,
-        @Body() updateData: { [key: string]: any }
+        @Body() updateProjectDto: UpdateProjectDto
       ) {
-        console.log("Updating project fields!")
-        return this.projectService.updateFields(id, updateData);
+        return this.projectService.updateFields(id, updateProjectDto);
     }
 
     // Delete a project by id

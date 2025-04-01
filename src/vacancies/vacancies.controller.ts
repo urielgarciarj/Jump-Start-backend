@@ -66,8 +66,19 @@ export class VacanciesController {
   // Get all vacancies sorted by status, only active vacancies
   @Get('sorted/active')
   async findAllActive(): Promise<Vacant[]> {
-    console.log('Getting all active vacancies!');
     return this.vacanciesService.findAllActive();
+  }
+
+  // Obtener estudiantes recomendados para una vacante específica
+  @Get('recommend-students-for-vacant/:vacantId')
+  getRecommendedStudentsForVacant(@Param('vacantId') vacantId: string) {
+    return this.vacanciesService.recommendStudentsForVacant(Number(vacantId));
+  }
+
+  // Obtener vacantes recomendadas para un estudiante específico
+  @Get('recommend-vacants-for-student/:userId')
+  getRecommendedVacantsForStudent(@Param('userId') userId: string) {
+    return this.vacanciesService.recommendVacantsForStudent(Number(userId));
   }
 
   // Update fields from a vacant by id
