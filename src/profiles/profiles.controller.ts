@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Param, Patch, Post, UseInterceptors, UploadedFile, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Param, Patch, Post, UseInterceptors, UploadedFile, Delete, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -15,6 +15,20 @@ export class ProfilesController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     return this.profilesService.updateOrCreateProfile(userId, updateProfileDto);
+  }
+
+  //Nuevas rutas para manejar los enlaces a redes sociales
+  @Put('update-social-links/:userId')
+  async updateSocialLinks(
+    @Param('userId') userId: string,
+    @Body() socialLinksDto: { facebook?: string; twitter?: string; linkedin?: string, instagram?: string },
+  ) {
+    return this.profilesService.updateSocialLinks(Number(userId), socialLinksDto);
+  }
+
+  @Get('social-links/:userId')
+  async getSocialLinks(@Param('userId') userId: string) {
+    return this.profilesService.getSocialLinks(Number(userId));
   }
 
   // Upload a profile picture and update the profile with the image URL

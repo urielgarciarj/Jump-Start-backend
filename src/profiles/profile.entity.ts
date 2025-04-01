@@ -34,6 +34,18 @@ export class Profile {
     @Column({ nullable: true })
     cv?: string;
 
+    @Column({ nullable: true })
+    facebook?: string;
+
+    @Column({ nullable: true })
+    twitter?: string;
+
+    @Column({ nullable: true })
+    linkedin?: string;
+
+    @Column({ nullable: true })
+    instagram?: string;
+
     @OneToOne(() => User, user => user.profile)
     user: User;
 }

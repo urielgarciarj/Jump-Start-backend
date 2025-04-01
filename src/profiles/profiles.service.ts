@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus, Patch, Param, Body } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from './profile.entity';
@@ -205,4 +205,54 @@ export class ProfilesService {
     
     return this.profileRepository.save(profile);
   }
+
+  // obtener redes sociales
+  async updateSocialLinks(userId: number, socialLinks: { facebook?: string, twitter?: string, linkedin?: string, instagram?: string }): Promise<Profile> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+  
+    // Actualizar solo los campos proporcionados
+    if (socialLinks.facebook) {
+      profile.facebook = socialLinks.facebook;
+    }
+    if (socialLinks.twitter) {
+      profile.twitter = socialLinks.twitter;
+    }
+    if (socialLinks.linkedin) {
+      profile.linkedin = socialLinks.linkedin;
+    }
+    if (socialLinks.instagram) {
+      profile.instagram = socialLinks.instagram;
+    }
+  
+    return this.profileRepository.save(profile);
+  }
+
+  async getSocialLinks(userId: number): Promise<{ facebook?: string, twitter?: string, linkedin?: string, instagram?: string }> {
+    const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
+    }
+  
+    return {
+      facebook: profile.facebook,
+      twitter: profile.twitter,
+      linkedin: profile.linkedin,
+      instagram: profile.instagram,
+    };
+  }
+
+  // @Patch('update-social-links/:userId')
+  // async updateSocialLinks(
+  //   @Param('userId') userId: number,
+  //   @Body() socialLinks: {facebook?: string, twitter?: string, linkedin?: string, instagram?: string }
+  // ) {
+  //   return this.profilesService.updateSocialLinks(userId, socialLinks);
+  // }
+  // @Get('social-links/:userId')
+  // async getSocialLinks(@Param('userId')userId: number) {
+  //   return this.profilesService.getSocialLinks(userId);
+  // }
 }
