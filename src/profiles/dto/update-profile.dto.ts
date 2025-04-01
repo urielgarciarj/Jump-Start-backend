@@ -24,4 +24,16 @@ export class UpdateProfileDto {
 
     @IsOptional()
     picture?: string;
+
+    @IsOptional()
+    facebook?: string;
+
+    @IsOptional()
+    twitter?: string;
+
+    @IsOptional()
+    linkedin?: string;
+
+    @IsOptional()
+    instagram?: string;
 }
