@@ -48,17 +48,17 @@ export class ProfilesController {
     }),
   )
   async uploadCV(
-    @Param('userId') userId: number,
+    @Param('userId') userId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const fileUrl = await this.profilesService.uploadCV(userId, file);
+    const fileUrl = await this.profilesService.uploadCV(Number(userId), file);
     return { message: 'CV subido exitosamente', fileUrl };
   }
 
   // Obtener URL de descarga del CV
   @Get('download-cv/:userId')
-  async downloadCV(@Param('userId') userId: number) {
-    return this.profilesService.getCV(userId);
+  async downloadCV(@Param('userId') userId: string) {
+    return this.profilesService.getCV(Number(userId));
   }
 
   @Patch('update-skills/:userId')

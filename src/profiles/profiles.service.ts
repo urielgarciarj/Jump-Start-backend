@@ -87,7 +87,7 @@ export class ProfilesService {
     if (!file) {
       throw new HttpException('Archivo no proporcionado', HttpStatus.BAD_REQUEST);
     }
-
+    
     // Verificar que el archivo es un PDF
     if (file.mimetype !== 'application/pdf') {
       throw new HttpException('El archivo debe ser un PDF', HttpStatus.BAD_REQUEST);
