@@ -21,11 +21,11 @@ import { GlobalSearchModule } from './global-search/global-search.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: process.env.AWS_DB_HOST,
       port: 3306,
       username: 'root',
-      password: '',
-      database: 'jump-start-db',
+      password: process.env.AWS_DB_PASSWORD,
+      database: process.env.AWS_DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
