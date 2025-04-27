@@ -25,7 +25,7 @@ import { GlobalSearchModule } from './global-search/global-search.module';
       port: 3306,
       username: 'root',
       password: process.env.AWS_DB_PASSWORD,
-      database: process.env.AWS_DB_NAME,
+      database: "jump-start-db",
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
