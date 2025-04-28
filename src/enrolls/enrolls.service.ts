@@ -131,18 +131,33 @@ export class EnrollsService {
   async findAllProjectsWhereUserEnrolled(userId: number) {
     const enrolls = await this.enrollsRepository.find({
       where: { user: { id: userId } },
-      relations: ['project', 'project.professor'], // Asegúrate de cargar la vacante asociada con cada solicitud
+      relations: ['project', 'project.professor', 'project.professor.profile'], // Asegúrate de cargar la vacante asociada con cada solicitud
     });
 
     return enrolls.map(enroll => {
       const project = enroll.project;
+      const professor = project.professor;
+      const profile = professor.profile;
+  
       return {
-        ...project,
-        creator: {
-          id: project.professor.id,  // ID del creador (userId)
-          name: project.professor.name,  // Nombre del creador
-          lastname: project.professor.lastName,  // Apellido del creador
-        }
+        id: project.id,
+        name: project.name,
+        status: project.status,
+        category: project.category,
+        description: project.description,
+        requirements: project.requirements,
+        startDate: project.startDate,
+        endDate: project.endDate,
+        dateCreated: project.dateCreated,
+        professor: {
+          id: professor.id,
+          name: professor.name,
+          lastName: professor.lastName,
+          profile: {
+            picture: profile?.picture || null,
+            university: profile?.university || null,
+          },
+        },
       };
     });
   }
