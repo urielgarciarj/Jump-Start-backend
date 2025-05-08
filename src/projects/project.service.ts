@@ -99,10 +99,30 @@ export class ProjectService {
     if (professor.role.toLocaleLowerCase() !== 'docente') {
       throw new Error('User is not a professor');
     }
-    return this.projectsRepository.find({
-      where: { professor: { id } },
-      relations: ['professor'],
-    });
+    const projectsArray = await this.projectsRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.professor', 'professor')
+      .leftJoinAndSelect('professor.profile', 'profile')
+      .where('professor.id = :id', { id: id })
+      .orderBy('project.dateCreated', 'DESC')
+      .select([
+        'project.id',
+        'project.name',
+        'project.status',
+        'project.category',
+        'project.description',
+        'project.requirements',
+        'project.startDate',
+        'project.endDate',
+        'project.dateCreated',
+        'professor.id',
+        'professor.name',
+        'professor.lastName',
+        'profile.picture',
+        'profile.university',
+      ])
+      .getMany();
+
+    return projectsArray || [];
   }
 
   // Update a field from a project by id
