@@ -7,7 +7,7 @@ export class Profile {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ default: 'Mi trayectoria...', type: 'text' })
+    @Column({ type: 'text', nullable: true })
     aboutMe?: string;
 
     @Column({ nullable: true })
