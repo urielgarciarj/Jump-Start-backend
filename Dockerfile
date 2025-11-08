@@ -3,11 +3,16 @@ FROM node:23-alpine AS build
 
 WORKDIR /usr/src/app
 
+# Copy only package files first to leverage cache
 COPY package*.json ./
 
-RUN npm install
+# Use cache mount for faster installations
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
-COPY . .
+# Copy only necessary files
+COPY tsconfig*.json ./
+COPY src ./src
 
 RUN npm run build
 
@@ -20,12 +25,15 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=build /usr/src/app/dist ./dist
-
 COPY package*.json ./
 
-RUN npm install --only=production
+# Use cache mount for production dependencies too
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --only=production
 
-RUN rm package*.json
+# No need to remove package.json - use smaller image instead
+# Use non-root user for better security
+USER node
 
 EXPOSE 3000
 
