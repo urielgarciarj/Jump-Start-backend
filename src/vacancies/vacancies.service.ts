@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Vacant } from './vacancies.entity';
 import { User } from '../users/user.entity';
 import { CreateVacantDto } from './dto/create-vacant.dto';
@@ -330,7 +330,7 @@ export class VacanciesService {
 
     // 2. Obtener todos los usuarios estudiantes
     const students = await this.usersRepository.find({
-      where: { role: 'estudiante' },
+      where: { role: ILike('estudiante') },
       relations: ['profile']
     });
 
@@ -515,7 +515,7 @@ export class VacanciesService {
       throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
     }
 
-    if (student.role !== 'Estudiante') {
+    if (student.role.toLowerCase() !== 'estudiante') {
       return {
         message: `El usuario con ID ${userId} no es un estudiante`,
         student: {

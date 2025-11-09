@@ -22,7 +22,7 @@ export class EventsService {
     if (!user) {
       throw new NotFoundException(`User with ID ${createEventDto.userId} is not found`);
     }
-    if(user.role !== 'reclutador'){
+    if(user.role.toLowerCase() !== 'reclutador'){
       throw new ForbiddenException(`User with ID ${createEventDto.userId} is not a recruiter`,);
     }
     const event = this.eventRepository.create({
@@ -41,7 +41,7 @@ export class EventsService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
     
-    if(user.role !== 'reclutador'){
+    if(user.role.toLowerCase() !== 'reclutador'){
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
 
@@ -80,7 +80,7 @@ export class EventsService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    if (user.role !== 'reclutador') {
+    if (user.role.toLowerCase() !== 'reclutador') {
       throw new ForbiddenException(`User with ID ${userId} is not a recruiter`);
     }
 
