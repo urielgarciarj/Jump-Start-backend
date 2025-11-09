@@ -244,6 +244,98 @@ export class ProfilesService {
     };
   }
 
+  // Buscar estudiantes por skills con nivel de coincidencia
+  async searchStudentsBySkills(searchSkills: string[] | string): Promise<any[]> {
+    // Convertir a array si es un string
+    let skillsArray: string[];
+    if (typeof searchSkills === 'string') {
+      skillsArray = searchSkills.split(',').map(skill => skill.trim());
+    } else {
+      skillsArray = searchSkills;
+    }
+    
+    // Normalizar las skills de búsqueda (lowercase y trim)
+    const normalizedSearchSkills = skillsArray.map(skill => skill.toLowerCase().trim());
+    
+    console.log('🔍 Buscando skills:', normalizedSearchSkills);
+    
+    // Obtener todos los perfiles que tengan skills definidas y que sean de estudiantes
+    const profiles = await this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .where('profile.skills IS NOT NULL')
+      .andWhere('profile.skills != :empty', { empty: '' })
+      .andWhere('LOWER(user.role) = :role', { role: 'estudiante' })
+      .getMany();
+
+    console.log(`📊 Perfiles encontrados con skills: ${profiles.length}`);
+    
+    if (profiles.length > 0) {
+      console.log('📝 Ejemplo de perfil encontrado:', {
+        userId: profiles[0].user?.id,
+        role: profiles[0].user?.role,
+        skills: profiles[0].skills
+      });
+    }
+
+    // Calcular coincidencias para cada perfil
+    const studentsWithMatch = profiles.map(profile => {
+      // Convertir las skills del perfil en un array y normalizar
+      const profileSkills = profile.skills
+        ? profile.skills.split(',').map(skill => skill.toLowerCase().trim())
+        : [];
+
+      // Calcular cuántas skills coinciden
+      const matchingSkills = normalizedSearchSkills.filter(searchSkill =>
+        profileSkills.some(profileSkill => profileSkill.includes(searchSkill) || searchSkill.includes(profileSkill))
+      );
+
+      const matchCount = matchingSkills.length;
+      const matchPercentage = (matchCount / normalizedSearchSkills.length) * 100;
+
+      return {
+        userId: profile.user.id,
+        name: profile.user.name,
+        lastName: profile.user.lastName,
+        email: profile.user.email,
+        profile: {
+          id: profile.id,
+          aboutMe: profile.aboutMe,
+          location: profile.location,
+          phone: profile.phone,
+          skills: profile.skills,
+          university: profile.university,
+          picture: profile.picture,
+          cv: profile.cv,
+          facebook: profile.facebook,
+          twitter: profile.twitter,
+          linkedin: profile.linkedin,
+          instagram: profile.instagram,
+        },
+        matchCount,
+        matchPercentage: Math.round(matchPercentage * 100) / 100, // Redondear a 2 decimales
+        matchingSkills: matchingSkills,
+        totalSkillsSearched: normalizedSearchSkills.length,
+      };
+    });
+
+    console.log(`✅ Estudiantes con al menos 1 coincidencia: ${studentsWithMatch.filter(s => s.matchCount > 0).length}`);
+
+    // Filtrar solo los que tienen al menos una coincidencia y ordenar por coincidencia
+    const filteredStudents = studentsWithMatch
+      .filter(student => student.matchCount > 0)
+      .sort((a, b) => {
+        // Primero ordenar por matchCount (descendente)
+        if (b.matchCount !== a.matchCount) {
+          return b.matchCount - a.matchCount;
+        }
+        // Si tienen el mismo matchCount, ordenar por porcentaje
+        return b.matchPercentage - a.matchPercentage;
+      });
+
+    return filteredStudents;
+  }
+
   // @Patch('update-social-links/:userId')
   // async updateSocialLinks(
   //   @Param('userId') userId: number,

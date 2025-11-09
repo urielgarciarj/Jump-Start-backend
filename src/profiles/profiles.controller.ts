@@ -3,6 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { RemoveSkillsDto } from './dto/remove-skills.dto';
+import { SearchBySkillsDto } from './dto/search-by-skills.dto';
 import * as multer from 'multer';
 
 @Controller('profiles')
@@ -101,5 +102,11 @@ export class ProfilesController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.profilesService.findOne(Number(id));
+  }
+
+  // Endpoint para buscar estudiantes por skills
+  @Post('search-by-skills')
+  async searchStudentsBySkills(@Body() searchBySkillsDto: SearchBySkillsDto) {
+    return this.profilesService.searchStudentsBySkills(searchBySkillsDto.skills);
   }
 }

@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Enroll } from './enroll.entity';
 import { Project } from 'src/projects/project.entity';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 @Injectable()
 export class EnrollsService {
@@ -18,7 +18,7 @@ export class EnrollsService {
   // Creates a new enroll
   async create(createEnrollDto: CreateEnrollDto) {
     const user = await this.usersRepository.findOne({
-      where: { id: Number(createEnrollDto.userId), role: 'estudiante' },
+      where: { id: Number(createEnrollDto.userId), role: ILike('estudiante') },
     });
     const project = await this.projectsRepository.findOne({
       where: { id: Number(createEnrollDto.projectId) },

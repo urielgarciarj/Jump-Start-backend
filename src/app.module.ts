@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -16,18 +17,18 @@ import { PostCommentsModule } from './post-comments/post-comments.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { EnrollsModule } from './enrolls/enrolls.module';
 import { GlobalSearchModule } from './global-search/global-search.module';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.AWS_DB_HOST,
-      port: 3306,
-      username: 'root',
-      password: process.env.AWS_DB_PASSWORD,
-      database: "jump-start-db",
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
     }),
     UsersModule,
     ProfilesModule,
@@ -42,7 +43,8 @@ import { GlobalSearchModule } from './global-search/global-search.module';
     PostCommentsModule,
     ApplicationsModule,
     EnrollsModule,
-    GlobalSearchModule],
+    GlobalSearchModule,
+    TypeOrmModule.forFeature([User])],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Application } from './application.entity';
 import { Vacant } from 'src/vacancies/vacancies.entity';
 
@@ -17,7 +17,7 @@ export class ApplicationsService {
 
   async create(createApplicationDto: CreateApplicationDto) {
     const user = await this.usersRepository.findOne({
-      where: { id: Number(createApplicationDto.userId), role: 'estudiante' },
+      where: { id: Number(createApplicationDto.userId), role: ILike('estudiante') },
     });
     const vacant = await this.vacantRepository.findOne({
       where: { id: Number(createApplicationDto.vacantId) },
