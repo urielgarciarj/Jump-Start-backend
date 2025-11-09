@@ -17,7 +17,7 @@ export class ClassesService {
         const user = await this.usersRepository.findOne({ where: { id: createClassesDto.teacherId } });
         console.log('user', user);
     
-        if (!user || user.role !== 'docente') {
+        if (!user || user.role.toLowerCase() !== 'docente') {
           throw new NotFoundException(`User with ID ${createClassesDto.teacherId} not found`);
         }
         const tClass = this.ClassesRepository.create({
