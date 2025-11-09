@@ -66,6 +66,15 @@ export class ProjectController {
         return this.projectService.debugMatchSkills(Number(projectId), skills);
     }
 
+    // Debug: Verificar por qué un usuario no es recomendado para un proyecto
+    @Get('debug-user-match/:projectId/:userId')
+    debugUserMatch(
+        @Param('projectId') projectId: string,
+        @Param('userId') userId: string
+    ) {
+        return this.projectService.debugUserSkillsForProject(Number(userId), Number(projectId));
+    }
+
     // Update a field from a project by id
     @Put('updateFields/:id')
     updateFields(

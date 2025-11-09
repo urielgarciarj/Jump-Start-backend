@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -470,7 +470,7 @@ export class ProjectService {
 
     // 2. Obtener todos los usuarios que pueden ser candidatos (estudiantes)
     const users = await this.usersRepository.find({
-      where: { role: 'estudiante' },
+      where: { role: ILike('estudiante') },
       relations: ['profile']
     });
 
@@ -564,22 +564,31 @@ export class ProjectService {
         // Filtrar usuarios que ya están inscritos en este proyecto
         .filter(profile => !profile.enrolledProjectIds.includes(project.id))
         .map(profile => {
-          let matchScore = 0;
+          // Contar cuántos requisitos del proyecto coinciden con las habilidades del usuario
+          let exactMatches = 0;
+          const matchingSkills = [];
           
-          // Calcular puntuación basada en la frecuencia de habilidades
           projectRequirements.forEach(requirement => {
-            // Añadir la frecuencia de esta habilidad a la puntuación
-            matchScore += profile.skillFrequency[requirement] || 0;
+            // Si el usuario tiene esta habilidad (frecuencia > 0), cuenta como coincidencia
+            if (profile.skillFrequency[requirement] && profile.skillFrequency[requirement] > 0) {
+              exactMatches++;
+              matchingSkills.push(requirement);
+            }
           });
 
-          // Calcular un porcentaje: puntuación relativa al máximo posible
-          // El máximo posible sería tener todas las habilidades requeridas con la máxima frecuencia
-          const frequencyValues = Object.values(profile.skillFrequency) as number[];
-          const maxFrequency = frequencyValues.length > 0 ? Math.max(...frequencyValues) : 1;
-          const maxPossibleScore = projectRequirements.length * maxFrequency;
+          // Calcular el porcentaje de coincidencia basado en cuántos requisitos se cumplen
+          const matchPercentage = projectRequirements.length > 0 ? 
+            (exactMatches / projectRequirements.length) * 100 : 0;
+
+          // El matchScore ahora refleja el número de coincidencias exactas
+          // más un bonus por la frecuencia de esas habilidades
+          let matchScore = exactMatches * 100; // Base score
           
-          const matchPercentage = maxPossibleScore > 0 ? 
-            (matchScore / maxPossibleScore) * 100 : 0;
+          // Agregar bonus por frecuencia (experiencia)
+          matchingSkills.forEach(skill => {
+            const frequency = profile.skillFrequency[skill] || 1;
+            matchScore += (frequency - 1) * 10; // Bonus de 10 puntos por cada repetición adicional
+          });
 
           return {
             userId: profile.user.id,
@@ -591,11 +600,19 @@ export class ProjectService {
             expandedSkills: profile.expandedSkills,
             skillFrequency: profile.skillFrequency,
             matchScore,
-            matchPercentage: Math.round(matchPercentage)
+            matchPercentage: Math.round(matchPercentage),
+            matchingSkills
           };
         })
-        // Ordenar por puntuación (descendente)
-        .sort((a, b) => b.matchScore - a.matchScore)
+        // Filtrar usuarios con al menos 50% de coincidencia
+        .filter(user => user.matchPercentage >= 50)
+        // Ordenar por porcentaje de coincidencia (descendente) y luego por matchScore
+        .sort((a, b) => {
+          if (b.matchPercentage !== a.matchPercentage) {
+            return b.matchPercentage - a.matchPercentage;
+          }
+          return b.matchScore - a.matchScore;
+        })
         // Tomar los 10 mejores candidatos
         .slice(0, 10);
 
@@ -617,6 +634,118 @@ export class ProjectService {
         ? 'Recomendaciones de usuarios para proyectos generadas con éxito' 
         : 'No se encontraron coincidencias adecuadas',
       recommendations: filteredRecommendations
+    };
+  }
+
+  /**
+   * Debug endpoint para verificar la normalización de habilidades de un usuario específico
+   * @param userId - ID del usuario a analizar
+   * @param projectId - ID del proyecto a comparar
+   */
+  async debugUserSkillsForProject(userId: number, projectId: number): Promise<any> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['profile']
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+
+    const project = await this.projectsRepository.findOne({
+      where: { id: projectId }
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Proyecto con ID ${projectId} no encontrado`);
+    }
+
+    // Obtener habilidades base
+    const baseSkills = user.profile?.skills || '';
+    
+    // Normalizar habilidades del usuario
+    const userSkillsArray = baseSkills
+      .split(/[,;]+/)
+      .map(skill => skill.trim().toLowerCase())
+      .filter(skill => skill.length > 0);
+
+    // Normalizar requisitos del proyecto
+    const projectRequirements = project.requirements
+      .split(/[,;]+/)
+      .map(req => req.trim().toLowerCase())
+      .filter(req => req.length > 0);
+
+    // Obtener inscripciones del usuario
+    const allEnrollments = await this.enrollRepository.find({
+      where: { user: { id: userId } },
+      relations: ['project']
+    });
+
+    const enrolledProjectIds = allEnrollments.map(e => e.project.id);
+
+    // Calcular skillFrequency
+    let expandedSkills = [...userSkillsArray];
+    
+    for (const enrolledProjectId of enrolledProjectIds) {
+      const enrolledProject = await this.projectsRepository.findOne({
+        where: { id: enrolledProjectId }
+      });
+
+      if (enrolledProject && enrolledProject.requirements) {
+        const projectReqs = enrolledProject.requirements
+          .split(/[,;]+/)
+          .map(req => req.trim().toLowerCase())
+          .filter(req => req.length > 0);
+        
+        expandedSkills = [...expandedSkills, ...projectReqs];
+      }
+    }
+
+    const skillFrequency: { [key: string]: number } = {};
+    expandedSkills.forEach(skill => {
+      skillFrequency[skill] = (skillFrequency[skill] || 0) + 1;
+    });
+
+    // Calcular coincidencias
+    let exactMatches = 0;
+    const matchingSkills = [];
+    
+    projectRequirements.forEach(requirement => {
+      if (skillFrequency[requirement] && skillFrequency[requirement] > 0) {
+        exactMatches++;
+        matchingSkills.push(requirement);
+      }
+    });
+
+    const matchPercentage = projectRequirements.length > 0 ? 
+      (exactMatches / projectRequirements.length) * 100 : 0;
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        rawSkills: baseSkills
+      },
+      project: {
+        id: project.id,
+        name: project.name,
+        status: project.status,
+        rawRequirements: project.requirements
+      },
+      normalized: {
+        userSkills: userSkillsArray,
+        projectRequirements: projectRequirements
+      },
+      enrolledProjects: enrolledProjectIds,
+      skillFrequency,
+      expandedSkills,
+      matching: {
+        exactMatches,
+        matchingSkills,
+        matchPercentage: Math.round(matchPercentage),
+        wouldBeRecommended: matchPercentage >= 50 && (project.status === 'activo' || project.status === 'abierto')
+      }
     };
   }
 
@@ -652,7 +781,7 @@ export class ProjectService {
 
     // 2. Obtener todos los usuarios estudiantes
     const users = await this.usersRepository.find({
-      where: { role: 'estudiante' },
+      where: { role: ILike('estudiante') },
       relations: ['profile']
     });
 
@@ -759,22 +888,31 @@ export class ProjectService {
 
     // 5. Calcular puntuación para cada usuario
     const scoredUsers = validUserProfiles.map(profile => {
-      let matchScore = 0;
+      // Contar cuántos requisitos del proyecto coinciden con las habilidades del usuario
+      let exactMatches = 0;
+      const matchingSkills = [];
       
-      // Calcular puntuación basada en la frecuencia de habilidades
       projectRequirements.forEach(requirement => {
-        // Añadir la frecuencia de esta habilidad a la puntuación
-        matchScore += profile.skillFrequency[requirement] || 0;
+        // Si el usuario tiene esta habilidad (frecuencia > 0), cuenta como coincidencia
+        if (profile.skillFrequency[requirement] && profile.skillFrequency[requirement] > 0) {
+          exactMatches++;
+          matchingSkills.push(requirement);
+        }
       });
 
-      // Calcular un porcentaje: puntuación relativa al máximo posible
-      // El máximo posible sería tener todas las habilidades requeridas con la máxima frecuencia
-      const frequencyValues = Object.values(profile.skillFrequency) as number[];
-      const maxFrequency = frequencyValues.length > 0 ? Math.max(...frequencyValues) : 1;
-      const maxPossibleScore = projectRequirements.length * maxFrequency;
+      // Calcular el porcentaje de coincidencia basado en cuántos requisitos se cumplen
+      const matchPercentage = projectRequirements.length > 0 ? 
+        (exactMatches / projectRequirements.length) * 100 : 0;
+
+      // El matchScore ahora refleja el número de coincidencias exactas
+      // más un bonus por la frecuencia de esas habilidades
+      let matchScore = exactMatches * 100; // Base score
       
-      const matchPercentage = maxPossibleScore > 0 ? 
-        (matchScore / maxPossibleScore) * 100 : 0;
+      // Agregar bonus por frecuencia (experiencia)
+      matchingSkills.forEach(skill => {
+        const frequency = profile.skillFrequency[skill] || 1;
+        matchScore += (frequency - 1) * 10; // Bonus de 10 puntos por cada repetición adicional
+      });
 
       return {
         userId: profile.user.id,
@@ -786,14 +924,22 @@ export class ProjectService {
         expandedSkills: profile.expandedSkills,
         skillFrequency: profile.skillFrequency,
         matchScore,
-        matchPercentage: Math.round(matchPercentage)
+        matchPercentage: Math.round(matchPercentage),
+        matchingSkills
       };
     })
-    // Ordenar por puntuación (descendente)
-    .sort((a, b) => b.matchScore - a.matchScore);
+    // Filtrar usuarios con al menos 50% de coincidencia
+    .filter(user => user.matchPercentage >= 50)
+    // Ordenar por porcentaje de coincidencia (descendente) y luego por matchScore
+    .sort((a, b) => {
+      if (b.matchPercentage !== a.matchPercentage) {
+        return b.matchPercentage - a.matchPercentage;
+      }
+      return b.matchScore - a.matchScore;
+    });
 
-    // Filtrar usuarios con un porcentaje de coincidencia de al menos 50%
-    const recommendedUsers = scoredUsers.filter(user => user.matchPercentage >= 50);
+    // Los usuarios ya están filtrados y ordenados
+    const recommendedUsers = scoredUsers;
 
     return {
       message: recommendedUsers.length > 0 
