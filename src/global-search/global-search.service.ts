@@ -32,7 +32,7 @@ export class GlobalSearchService {
         'vacant.company',
         `(CASE WHEN LOWER(vacant.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(vacant.description) LIKE :term THEN 1 ELSE 0 END) AS score`,
-         `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/vancants/searchresult/', vacant.id) AS href`,
+         `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/vacancies/vacant/detail/', vacant.id) AS href`,
         `'vacant' AS source`,
       ])
       .where(
@@ -49,7 +49,7 @@ export class GlobalSearchService {
         'project.status',
         `(CASE WHEN LOWER(project.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(project.description) LIKE :term THEN 1 ELSE 0 END) AS score`,
-         `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/project/details/', project.id) AS href`,
+         `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/projects/project/detail/', project.id) AS href`,
         `'project' AS source`,
       ])
       .where(
@@ -67,7 +67,7 @@ export class GlobalSearchService {
         'user.role',
         `(CASE WHEN LOWER(user.name) LIKE :term THEN 3 ELSE 0 END + 
          CASE WHEN LOWER(user.lastName) LIKE :term THEN 1 ELSE 0 END) AS score`,
-        `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/profile/', user.id) AS href`,
+        `CONCAT('https://d1q65pcmt4d9l7.cloudfront.net/api/profiles/', user.id) AS href`,
         `'user' AS source`,
       ])
       .where(
