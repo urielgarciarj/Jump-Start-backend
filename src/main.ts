@@ -13,7 +13,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
-  
+  app.setGlobalPrefix('api');
   await app.listen(3000, '0.0.0.0'); // importante exponer en 0.0.0.0 en EC2
 }
 bootstrap();
